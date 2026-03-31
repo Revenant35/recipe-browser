@@ -1,0 +1,7 @@
+{
+  "name": "recipe-browser",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
