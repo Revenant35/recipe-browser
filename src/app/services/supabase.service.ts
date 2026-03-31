@@ -37,4 +37,12 @@ export class SupabaseService {
   signOut() {
     return this.supabase.auth.signOut();
   }
+
+  resetPasswordForEmail(email: string) {
+    return this.supabase.auth.resetPasswordForEmail(email);
+  }
+
+  updatePassword(password: string) {
+    return this.supabase.auth.updateUser({ password });
+  }
 }

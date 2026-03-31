@@ -1,52 +1,33 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Sign Up</ion-title>
-  </ion-toolbar>
-</ion-header>
+<form [formGroup]="signupForm" (ngSubmit)="submit()" class="actions">
+    <ion-input
+      type="email"
+      label="Email"
+      labelPlacement="floating"
+      fill="outline"
+      formControlName="email"
+    ></ion-input>
 
-<ion-content class="ion-padding">
-  <form (ngSubmit)="onSignup()">
-    <ion-item>
-      <ion-input
-        label="Email"
-        labelPlacement="stacked"
-        type="email"
-        [(ngModel)]="email"
-        name="email"
-        required
-      ></ion-input>
-    </ion-item>
+    <ion-input
+      type="password"
+      label="Password"
+      labelPlacement="floating"
+      fill="outline"
+      formControlName="password"
+      (keyup.enter)="submit()"
+    ></ion-input>
 
-    <ion-item>
-      <ion-input
-        label="Password"
-        labelPlacement="stacked"
-        type="password"
-        [(ngModel)]="password"
-        name="password"
-        required
-      ></ion-input>
-    </ion-item>
-
-    <ion-item>
-      <ion-input
-        label="Confirm Password"
-        labelPlacement="stacked"
-        type="password"
-        [(ngModel)]="confirmPassword"
-        name="confirmPassword"
-        required
-      ></ion-input>
-    </ion-item>
-
-    <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
-
-    <ion-button expand="block" type="submit" class="ion-margin-top">
-      Sign Up
+    <ion-button
+      expand="block"
+      type="submit"
+      [disabled]="loading() || signupForm.invalid"
+    >
+      @if (loading()) {
+        <ion-spinner name="crescent"></ion-spinner>
+      } @else {
+        <ion-icon slot="start" name="person-add-outline"></ion-icon>
+        Sign Up
+      }
     </ion-button>
-  </form>
 
-  <ion-button expand="block" fill="clear" routerLink="/login">
-    Already have an account? Log In
-  </ion-button>
-</ion-content>
+    <a routerLink="/auth/login" class="auth-link">Already have an account? Sign in</a>
+</form>

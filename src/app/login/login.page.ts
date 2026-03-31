@@ -1,30 +1,52 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { IonButton, IonIcon, IonInput, IonSpinner } from '@ionic/angular/standalone';
+import { ToastController } from '@ionic/angular';
+import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { RouterLink, Router } from '@angular/router';
+import { addIcons } from 'ionicons';
+import { logInOutline } from 'ionicons/icons';
 import { SupabaseService } from '../services/supabase.service';
 
 @Component({
   selector: 'app-login',
-  templateUrl: 'login.page.html',
-  styleUrls: ['login.page.scss'],
-  standalone: false,
+  standalone: true,
+  imports: [IonButton, IonIcon, IonInput, IonSpinner, ReactiveFormsModule, RouterLink],
+  templateUrl: './login.page.html',
+  styleUrl: './login.page.scss',
 })
 export class LoginPage {
-  email = '';
-  password = '';
-  errorMessage = '';
+  private supabase = inject(SupabaseService);
+  private toastCtrl = inject(ToastController);
+  private router = inject(Router);
 
-  constructor(
-    private supabase: SupabaseService,
-    private router: Router
-  ) {}
+  protected loginForm = new FormGroup({
+    email: new FormControl('', [Validators.required, Validators.email]),
+    password: new FormControl('', [Validators.required]),
+  });
+  protected loading = signal(false);
 
-  async onLogin() {
-    this.errorMessage = '';
-    const { error } = await this.supabase.signIn(this.email, this.password);
+  constructor() {
+    addIcons({ logInOutline });
+  }
+
+  protected async submit(): Promise<void> {
+    if (this.loginForm.invalid) return;
+
+    const { email, password } = this.loginForm.value;
+    this.loading.set(true);
+    const { error } = await this.supabase.signIn(email!.trim(), password!);
+    this.loading.set(false);
+
     if (error) {
-      this.errorMessage = error.message;
-    } else {
-      this.router.navigateByUrl('/home');
+      const toast = await this.toastCtrl.create({
+        message: error.message,
+        duration: 5000,
+        color: 'danger',
+      });
+      await toast.present();
+      return;
     }
+
+    await this.router.navigateByUrl('/home');
   }
 }

@@ -1,40 +1,44 @@
 import { Component, inject, signal } from '@angular/core';
 import { IonButton, IonIcon, IonInput, IonSpinner } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
+import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { personAddOutline } from 'ionicons/icons';
+import { lockClosedOutline } from 'ionicons/icons';
 import { SupabaseService } from '../services/supabase.service';
 
 @Component({
-  selector: 'app-signup',
+  selector: 'app-reset-password',
   standalone: true,
-  imports: [IonButton, IonIcon, IonInput, IonSpinner, ReactiveFormsModule, RouterLink],
-  templateUrl: './signup.page.html',
-  styleUrl: './signup.page.scss',
+  imports: [IonButton, IonIcon, IonInput, IonSpinner, ReactiveFormsModule],
+  templateUrl: './reset-password.page.html',
+  styleUrl: './reset-password.page.scss',
 })
-export class SignupPage {
+export class ResetPasswordPage {
   private supabase = inject(SupabaseService);
   private toastCtrl = inject(ToastController);
   private router = inject(Router);
 
-  protected signupForm = new FormGroup({
-    email: new FormControl('', [Validators.required, Validators.email]),
+  protected passwordForm = new FormGroup({
     password: new FormControl('', [Validators.required, Validators.minLength(8)]),
+    confirmPassword: new FormControl('', [Validators.required]),
   });
   protected loading = signal(false);
 
   constructor() {
-    addIcons({ personAddOutline });
+    addIcons({ lockClosedOutline });
+  }
+
+  protected passwordsMatch(): boolean {
+    return this.passwordForm.value.password === this.passwordForm.value.confirmPassword;
   }
 
   protected async submit(): Promise<void> {
-    if (this.signupForm.invalid) return;
+    if (this.passwordForm.invalid || !this.passwordsMatch()) return;
 
-    const { email, password } = this.signupForm.value;
+    const { password } = this.passwordForm.value;
     this.loading.set(true);
-    const { error } = await this.supabase.signUp(email!.trim(), password!);
+    const { error } = await this.supabase.updatePassword(password!);
     this.loading.set(false);
 
     if (error) {
@@ -47,6 +51,11 @@ export class SignupPage {
       return;
     }
 
-    await this.router.navigateByUrl('/home');
+    const toast = await this.toastCtrl.create({
+      message: 'Password updated successfully.',
+      duration: 3000,
+    });
+    await toast.present();
+    await this.router.navigate(['/home']);
   }
 }

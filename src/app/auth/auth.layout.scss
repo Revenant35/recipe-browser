@@ -1,0 +1,46 @@
+.auth-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 24px;
+}
+
+.branding {
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+.app-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.tagline {
+  font-size: 18px;
+  color: var(--ion-color-medium);
+  margin: 8px 0 0;
+}
+
+::ng-deep router-outlet + * {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+}
+
+::ng-deep {
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .auth-link {
+    text-align: center;
+    color: var(--ion-color-primary);
+    font-size: 14px;
+    text-decoration: none;
+  }
+}

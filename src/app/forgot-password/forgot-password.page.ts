@@ -2,39 +2,38 @@ import { Component, inject, signal } from '@angular/core';
 import { IonButton, IonIcon, IonInput, IonSpinner } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { personAddOutline } from 'ionicons/icons';
+import { mailOutline } from 'ionicons/icons';
 import { SupabaseService } from '../services/supabase.service';
 
 @Component({
-  selector: 'app-signup',
+  selector: 'app-forgot-password',
   standalone: true,
   imports: [IonButton, IonIcon, IonInput, IonSpinner, ReactiveFormsModule, RouterLink],
-  templateUrl: './signup.page.html',
-  styleUrl: './signup.page.scss',
+  templateUrl: './forgot-password.page.html',
+  styleUrl: './forgot-password.page.scss',
 })
-export class SignupPage {
+export class ForgotPasswordPage {
   private supabase = inject(SupabaseService);
   private toastCtrl = inject(ToastController);
-  private router = inject(Router);
 
-  protected signupForm = new FormGroup({
+  protected emailForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required, Validators.minLength(8)]),
   });
   protected loading = signal(false);
+  protected sent = signal(false);
 
   constructor() {
-    addIcons({ personAddOutline });
+    addIcons({ mailOutline });
   }
 
   protected async submit(): Promise<void> {
-    if (this.signupForm.invalid) return;
+    if (this.emailForm.invalid) return;
 
-    const { email, password } = this.signupForm.value;
+    const { email } = this.emailForm.value;
     this.loading.set(true);
-    const { error } = await this.supabase.signUp(email!.trim(), password!);
+    const { error } = await this.supabase.resetPasswordForEmail(email!.trim());
     this.loading.set(false);
 
     if (error) {
@@ -47,6 +46,6 @@ export class SignupPage {
       return;
     }
 
-    await this.router.navigateByUrl('/home');
+    this.sent.set(true);
   }
 }
