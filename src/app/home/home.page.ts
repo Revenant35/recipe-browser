@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonHeader,
@@ -12,6 +12,7 @@ import {
 import { addIcons } from 'ionicons';
 import { logOutOutline } from 'ionicons/icons';
 import { SupabaseService } from '../services/supabase.service';
+import { RecipeService } from '../services/recipe.service';
 
 @Component({
   selector: 'app-home',
@@ -20,12 +21,18 @@ import { SupabaseService } from '../services/supabase.service';
   standalone: true,
   imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton, IonIcon],
 })
-export class HomePage {
+export class HomePage implements OnInit {
   private supabase = inject(SupabaseService);
+  private recipeService = inject(RecipeService);
   private router = inject(Router);
 
   constructor() {
     addIcons({ logOutOutline });
+  }
+
+  async ngOnInit() {
+    const recipes = await this.recipeService.getRecipes();
+    console.log('Recipes:', recipes);
   }
 
   async logout() {

@@ -42,6 +42,7 @@ export const recipes = sqliteTable('recipes', {
 });
 
 export const recipeIngredients = sqliteTable('recipe_ingredients', {
+  id: text('id').primaryKey().notNull(),
   created_at: text('created_at'),
   recipe_id: text('recipe_id').notNull(),
   value: text('value').notNull(),
@@ -49,6 +50,7 @@ export const recipeIngredients = sqliteTable('recipe_ingredients', {
 });
 
 export const recipeInstructions = sqliteTable('recipe_instructions', {
+  id: text('id').primaryKey().notNull(),
   created_at: text('created_at'),
   recipe_id: text('recipe_id').notNull(),
   order: integer('order').notNull(),
@@ -56,6 +58,7 @@ export const recipeInstructions = sqliteTable('recipe_instructions', {
 });
 
 export const recipeNotes = sqliteTable('recipe_notes', {
+  id: text('id').primaryKey().notNull(),
   created_at: text('created_at'),
   user_id: text('user_id').notNull(),
   recipe_id: text('recipe_id').notNull(),

@@ -22,6 +22,10 @@ export class SupabaseService {
     });
   }
 
+  get client(): SupabaseClient {
+    return this.supabase;
+  }
+
   get currentUser() {
     return this._session$.value?.user ?? null;
   }
