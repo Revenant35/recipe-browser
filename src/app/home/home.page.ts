@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { SupabaseService } from '../services/supabase.service';
 
 @Component({
   selector: 'app-home',
@@ -7,7 +9,13 @@ import { Component } from '@angular/core';
   standalone: false,
 })
 export class HomePage {
+  constructor(
+    private supabase: SupabaseService,
+    private router: Router
+  ) {}
 
-  constructor() {}
-
+  async logout() {
+    await this.supabase.signOut();
+    this.router.navigateByUrl('/login');
+  }
 }

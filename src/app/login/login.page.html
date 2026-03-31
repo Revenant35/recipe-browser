@@ -1,0 +1,41 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Log In</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form (ngSubmit)="onLogin()">
+    <ion-item>
+      <ion-input
+        label="Email"
+        labelPlacement="stacked"
+        type="email"
+        [(ngModel)]="email"
+        name="email"
+        required
+      ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        label="Password"
+        labelPlacement="stacked"
+        type="password"
+        [(ngModel)]="password"
+        name="password"
+        required
+      ></ion-input>
+    </ion-item>
+
+    <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+    <ion-button expand="block" type="submit" class="ion-margin-top">
+      Log In
+    </ion-button>
+  </form>
+
+  <ion-button expand="block" fill="clear" routerLink="/signup">
+    Don't have an account? Sign Up
+  </ion-button>
+</ion-content>
