@@ -1,0 +1,127 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ recipe().name }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">{{ recipe().name }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="recipe-content">
+    <p class="description">{{ recipe().description }}</p>
+
+    <div class="metadata">
+      @if (recipe().difficultyLevel; as difficulty) {
+        <ion-chip>{{ difficulty.name }}</ion-chip>
+      }
+      @if (recipe().section; as section) {
+        <ion-chip>{{ section.name }}</ion-chip>
+      }
+      @if (recipe().servings; as servings) {
+        <ion-chip>{{ servings }} servings</ion-chip>
+      }
+    </div>
+
+    @if (recipe().prep_time_minutes || recipe().cook_time_minutes) {
+      <div class="time-section">
+        @if (recipe().prep_time_minutes) {
+          <div class="time-item">
+            <span class="time-label">Prep</span>
+            <span class="time-value">{{ recipe().prep_time_minutes }} min</span>
+          </div>
+        }
+        @if (recipe().cook_time_minutes) {
+          <div class="time-item">
+            <span class="time-label">Cook</span>
+            <span class="time-value">{{ recipe().cook_time_minutes }} min</span>
+          </div>
+        }
+        @if (totalTime()) {
+          <div class="time-item">
+            <span class="time-label">Total</span>
+            <span class="time-value">{{ totalTime() }} min</span>
+          </div>
+        }
+      </div>
+    }
+
+    @if (recipe().calories || recipe().protein_grams || recipe().carbs_grams || recipe().fat_grams) {
+      <div class="nutrition-section">
+        <h3>Nutrition</h3>
+        <div class="nutrition-grid">
+          @if (recipe().calories) {
+            <div class="nutrition-item">
+              <span class="nutrition-value">{{ recipe().calories }}</span>
+              <span class="nutrition-label">Calories</span>
+            </div>
+          }
+          @if (recipe().protein_grams) {
+            <div class="nutrition-item">
+              <span class="nutrition-value">{{ recipe().protein_grams }}g</span>
+              <span class="nutrition-label">Protein</span>
+            </div>
+          }
+          @if (recipe().carbs_grams) {
+            <div class="nutrition-item">
+              <span class="nutrition-value">{{ recipe().carbs_grams }}g</span>
+              <span class="nutrition-label">Carbs</span>
+            </div>
+          }
+          @if (recipe().fat_grams) {
+            <div class="nutrition-item">
+              <span class="nutrition-value">{{ recipe().fat_grams }}g</span>
+              <span class="nutrition-label">Fat</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    @if (recipe().ingredients.length) {
+      <div class="ingredients-section">
+        <h3>Ingredients</h3>
+        <ion-list>
+          @for (ingredient of recipe().ingredients; track ingredient.id) {
+            <ion-item>
+              <ion-label>{{ ingredient.value }}</ion-label>
+            </ion-item>
+          }
+        </ion-list>
+      </div>
+    }
+
+    @if (recipe().instructions.length) {
+      <div class="instructions-section">
+        <h3>Instructions</h3>
+        <ion-list>
+          @for (instruction of recipe().instructions; track instruction.id; let i = $index) {
+            <ion-item>
+              <ion-note slot="start">{{ i + 1 }}</ion-note>
+              <ion-label class="ion-text-wrap">{{ instruction.value }}</ion-label>
+            </ion-item>
+          }
+        </ion-list>
+      </div>
+    }
+
+    @if (recipe().notes.length) {
+      <div class="notes-section">
+        <h3>Notes</h3>
+        <ion-list>
+          @for (note of recipe().notes; track note.id) {
+            <ion-item>
+              <ion-label class="ion-text-wrap">{{ note.value }}</ion-label>
+            </ion-item>
+          }
+        </ion-list>
+      </div>
+    }
+  </div>
+</ion-content>

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { eq } from 'drizzle-orm';
+import { asc, eq } from 'drizzle-orm';
 import { PowerSyncService } from './powersync.service';
-import { recipes } from '@app/db/schema';
+import { recipes, recipeIngredients, recipeInstructions } from '@app/db/schema';
 import { RecipeWithDetails } from '@app/models';
 
 @Injectable({ providedIn: 'root' })
@@ -17,8 +17,8 @@ export class RecipeService {
       with: {
         section: true,
         difficultyLevel: true,
-        ingredients: true,
-        instructions: true,
+        ingredients: { orderBy: asc(recipeIngredients.order) },
+        instructions: { orderBy: asc(recipeInstructions.order) },
         notes: true,
       },
     });
@@ -30,8 +30,8 @@ export class RecipeService {
       with: {
         section: true,
         difficultyLevel: true,
-        ingredients: true,
-        instructions: true,
+        ingredients: { orderBy: asc(recipeIngredients.order) },
+        instructions: { orderBy: asc(recipeInstructions.order) },
         notes: true,
       },
     });
