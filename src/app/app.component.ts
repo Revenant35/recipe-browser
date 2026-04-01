@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
+import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { SupabaseService } from './services/supabase.service';
 import { PowerSyncService } from './services/powersync.service';
 
@@ -8,7 +9,8 @@ import { PowerSyncService } from './services/powersync.service';
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
-  standalone: false,
+  standalone: true,
+  imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent implements OnInit, OnDestroy {
   private sessionSub!: Subscription;
