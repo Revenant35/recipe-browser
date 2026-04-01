@@ -2,39 +2,38 @@ import { Component, inject, signal } from '@angular/core';
 import { IonButton, IonIcon, IonInput, IonSpinner } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { logInOutline } from 'ionicons/icons';
-import { SupabaseService } from '../services/supabase.service';
+import { mailOutline } from 'ionicons/icons';
+import { SupabaseService } from '@app/services/supabase.service';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-forgot-password',
   standalone: true,
   imports: [IonButton, IonIcon, IonInput, IonSpinner, ReactiveFormsModule, RouterLink],
-  templateUrl: './login.page.html',
-  styleUrl: './login.page.scss',
+  templateUrl: './forgot-password.page.html',
+  styleUrl: './forgot-password.page.scss',
 })
-export class LoginPage {
+export class ForgotPasswordPage {
   private supabase = inject(SupabaseService);
   private toastCtrl = inject(ToastController);
-  private router = inject(Router);
 
-  protected loginForm = new FormGroup({
+  protected emailForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required]),
   });
   protected loading = signal(false);
+  protected sent = signal(false);
 
   constructor() {
-    addIcons({ logInOutline });
+    addIcons({ mailOutline });
   }
 
   protected async submit(): Promise<void> {
-    if (this.loginForm.invalid) return;
+    if (this.emailForm.invalid) return;
 
-    const { email, password } = this.loginForm.value;
+    const { email } = this.emailForm.value;
     this.loading.set(true);
-    const { error } = await this.supabase.signIn(email!.trim(), password!);
+    const { error } = await this.supabase.resetPasswordForEmail(email!.trim());
     this.loading.set(false);
 
     if (error) {
@@ -47,6 +46,6 @@ export class LoginPage {
       return;
     }
 
-    await this.router.navigateByUrl('/home');
+    this.sent.set(true);
   }
 }

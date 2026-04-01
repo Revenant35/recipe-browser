@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { addIcons } from 'ionicons';
 import { lockClosedOutline } from 'ionicons/icons';
-import { SupabaseService } from '../services/supabase.service';
+import { SupabaseService } from '@app/services/supabase.service';
 
 @Component({
   selector: 'app-reset-password',

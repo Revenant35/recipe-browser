@@ -8,21 +8,21 @@ export const authRoutes: Routes = [
     children: [
       {
         path: 'login',
-        loadComponent: () => import('../login/login.page').then((m) => m.LoginPage),
+        loadComponent: () => import('../pages/login/login.page').then((m) => m.LoginPage),
       },
       {
         path: 'signup',
-        loadComponent: () => import('../signup/signup.page').then((m) => m.SignupPage),
+        loadComponent: () => import('../pages/signup/signup.page').then((m) => m.SignupPage),
       },
       {
         path: 'forgot-password',
         loadComponent: () =>
-          import('../forgot-password/forgot-password.page').then((m) => m.ForgotPasswordPage),
+          import('../pages/forgot-password/forgot-password.page').then((m) => m.ForgotPasswordPage),
       },
       {
         path: 'reset-password',
         loadComponent: () =>
-          import('../reset-password/reset-password.page').then((m) => m.ResetPasswordPage),
+          import('../pages/reset-password/reset-password.page').then((m) => m.ResetPasswordPage),
       },
       {
         path: '',

@@ -2,39 +2,39 @@ import { Component, inject, signal } from '@angular/core';
 import { IonButton, IonIcon, IonInput, IonSpinner } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { personAddOutline } from 'ionicons/icons';
-import { SupabaseService } from '../services/supabase.service';
+import { logInOutline } from 'ionicons/icons';
+import { SupabaseService } from '@app/services/supabase.service';
 
 @Component({
-  selector: 'app-signup',
+  selector: 'app-login',
   standalone: true,
   imports: [IonButton, IonIcon, IonInput, IonSpinner, ReactiveFormsModule, RouterLink],
-  templateUrl: './signup.page.html',
-  styleUrl: './signup.page.scss',
+  templateUrl: './login.page.html',
+  styleUrl: './login.page.scss',
 })
-export class SignupPage {
+export class LoginPage {
   private supabase = inject(SupabaseService);
   private toastCtrl = inject(ToastController);
   private router = inject(Router);
 
-  protected signupForm = new FormGroup({
+  protected loginForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required, Validators.minLength(8)]),
+    password: new FormControl('', [Validators.required]),
   });
   protected loading = signal(false);
 
   constructor() {
-    addIcons({ personAddOutline });
+    addIcons({ logInOutline });
   }
 
   protected async submit(): Promise<void> {
-    if (this.signupForm.invalid) return;
+    if (this.loginForm.invalid) return;
 
-    const { email, password } = this.signupForm.value;
+    const { email, password } = this.loginForm.value;
     this.loading.set(true);
-    const { error } = await this.supabase.signUp(email!.trim(), password!);
+    const { error } = await this.supabase.signIn(email!.trim(), password!);
     this.loading.set(false);
 
     if (error) {

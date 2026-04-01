@@ -11,8 +11,8 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { logOutOutline } from 'ionicons/icons';
-import { SupabaseService } from '../services/supabase.service';
-import { RecipeService } from '../services/recipe.service';
+import { SupabaseService } from '@app/services/supabase.service';
+import { RecipeService } from '@app/services/recipe.service';
 
 @Component({
   selector: 'app-home',

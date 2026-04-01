@@ -2,38 +2,39 @@ import { Component, inject, signal } from '@angular/core';
 import { IonButton, IonIcon, IonInput, IonSpinner } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { mailOutline } from 'ionicons/icons';
-import { SupabaseService } from '../services/supabase.service';
+import { personAddOutline } from 'ionicons/icons';
+import { SupabaseService } from '@app/services/supabase.service';
 
 @Component({
-  selector: 'app-forgot-password',
+  selector: 'app-signup',
   standalone: true,
   imports: [IonButton, IonIcon, IonInput, IonSpinner, ReactiveFormsModule, RouterLink],
-  templateUrl: './forgot-password.page.html',
-  styleUrl: './forgot-password.page.scss',
+  templateUrl: './signup.page.html',
+  styleUrl: './signup.page.scss',
 })
-export class ForgotPasswordPage {
+export class SignupPage {
   private supabase = inject(SupabaseService);
   private toastCtrl = inject(ToastController);
+  private router = inject(Router);
 
-  protected emailForm = new FormGroup({
+  protected signupForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
+    password: new FormControl('', [Validators.required, Validators.minLength(8)]),
   });
   protected loading = signal(false);
-  protected sent = signal(false);
 
   constructor() {
-    addIcons({ mailOutline });
+    addIcons({ personAddOutline });
   }
 
   protected async submit(): Promise<void> {
-    if (this.emailForm.invalid) return;
+    if (this.signupForm.invalid) return;
 
-    const { email } = this.emailForm.value;
+    const { email, password } = this.signupForm.value;
     this.loading.set(true);
-    const { error } = await this.supabase.resetPasswordForEmail(email!.trim());
+    const { error } = await this.supabase.signUp(email!.trim(), password!);
     this.loading.set(false);
 
     if (error) {
@@ -46,6 +47,6 @@ export class ForgotPasswordPage {
       return;
     }
 
-    this.sent.set(true);
+    await this.router.navigateByUrl('/home');
   }
 }
