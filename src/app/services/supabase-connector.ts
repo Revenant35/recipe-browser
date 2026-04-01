@@ -1,10 +1,13 @@
+import { inject, Injectable } from '@angular/core';
 import {
   AbstractPowerSyncDatabase,
   CrudEntry,
   PowerSyncBackendConnector,
   UpdateType,
-} from '@powersync/web';
-import { SupabaseClient } from '@supabase/supabase-js';
+} from '@powersync/common';
+import { firstValueFrom } from 'rxjs';
+import { SupabaseService } from './supabase.service';
+import { environment } from '../../environments/environment';
 
 const FATAL_RESPONSE_CODES = [
   /^22...$/, // data exception
@@ -12,24 +15,19 @@ const FATAL_RESPONSE_CODES = [
   /^42...$/, // syntax error or access rule violation
 ];
 
+@Injectable({ providedIn: 'root' })
 export class SupabaseConnector implements PowerSyncBackendConnector {
-  constructor(
-    private client: SupabaseClient,
-    private powerSyncUrl: string,
-  ) {}
+  private readonly supabaseService = inject(SupabaseService);
 
   async fetchCredentials() {
-    const {
-      data: { session },
-      error,
-    } = await this.client.auth.getSession();
+    const session = await firstValueFrom(this.supabaseService.session$);
 
-    if (!session || error) {
-      throw new Error(`Could not fetch Supabase credentials: ${error?.message ?? 'No session'}`);
+    if (!session) {
+      throw new Error('Could not fetch Supabase credentials: No session');
     }
 
     return {
-      endpoint: this.powerSyncUrl,
+      endpoint: environment.powerSyncUrl,
       token: session.access_token,
       expiresAt: session.expires_at ? new Date(session.expires_at * 1000) : undefined,
     };
@@ -50,7 +48,7 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
       for (let i = 0; i < transaction.crud.length; i++) {
         const cruds = transaction.crud;
         const op = cruds[i];
-        const table = this.client.from(op.table);
+        const table = this.supabaseService.client.from(op.table);
         batchedOps.push(op);
 
         let result: any;

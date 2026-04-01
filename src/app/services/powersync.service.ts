@@ -1,37 +1,34 @@
-import { Injectable } from '@angular/core';
-import { PowerSyncDatabase } from '@powersync/web';
-import { wrapPowerSyncWithDrizzle, type PowerSyncSQLiteDatabase } from '@powersync/drizzle-driver';
+import { inject, Injectable } from '@angular/core';
+import { PowerSyncDatabase } from '@powersync/capacitor';
+import { wrapPowerSyncWithDrizzle } from '@powersync/drizzle-driver';
 import { AppSchema, drizzleSchema } from '../db';
 import { SupabaseConnector } from './supabase-connector';
-import { SupabaseService } from './supabase.service';
-import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class PowerSyncService {
-  db: PowerSyncDatabase;
-  drizzle: PowerSyncSQLiteDatabase<typeof drizzleSchema>;
+  private readonly connector = inject(SupabaseConnector);
+  private initPromise: Promise<void> | null = null;
 
-  private initialized = false;
+  public readonly db = new PowerSyncDatabase({
+    schema: AppSchema,
+    database: { dbFilename: 'recipe-browser.db' },
+  });
 
-  constructor(private supabaseService: SupabaseService) {
-    this.db = new PowerSyncDatabase({
-      schema: AppSchema,
-      database: { dbFilename: 'recipe-browser.db' },
-    });
-    this.drizzle = wrapPowerSyncWithDrizzle(this.db, { schema: drizzleSchema });
-  }
+  public readonly drizzle = wrapPowerSyncWithDrizzle(this.db, { schema: drizzleSchema });
 
   async init(): Promise<void> {
-    if (this.initialized) return;
+    if (!this.initPromise) {
+      this.initPromise = this.doInit();
+    }
+    return this.initPromise;
+  }
 
-    const connector = new SupabaseConnector(this.supabaseService.client, environment.powerSyncUrl);
-    await this.db.connect(connector);
-    this.initialized = true;
-    console.log('PowerSync connected');
+  private async doInit(): Promise<void> {
+    await this.db.connect(this.connector);
   }
 
   async disconnect(): Promise<void> {
     await this.db.disconnect();
-    this.initialized = false;
+    this.initPromise = null;
   }
 }

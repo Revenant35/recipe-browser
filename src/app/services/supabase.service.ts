@@ -5,12 +5,20 @@ import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class SupabaseService {
-  private readonly supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
+  private readonly supabase: SupabaseClient;
   private readonly _session$ = new ReplaySubject<Session | null>(1);
 
   public readonly session$ = this._session$.asObservable();
 
   constructor() {
+    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey, {
+      auth: {
+        lock: async (_name: string, _acquireTimeout: number, fn: () => Promise<any>) => {
+          return await fn();
+        },
+      },
+    });
+
     this.supabase.auth.getSession().then(({ data: { session } }) => {
       this._session$.next(session);
     });
