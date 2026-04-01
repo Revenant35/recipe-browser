@@ -1,18 +1,16 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient, Session } from '@supabase/supabase-js';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class SupabaseService {
-  private supabase: SupabaseClient;
-  private _session$ = new BehaviorSubject<Session | null>(null);
+  private readonly supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
+  private readonly _session$ = new BehaviorSubject<Session | null>(null);
 
-  session$: Observable<Session | null> = this._session$.asObservable();
+  public readonly session$ = this._session$.asObservable();
 
   constructor() {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
-
     this.supabase.auth.getSession().then(({ data: { session } }) => {
       this._session$.next(session);
     });
@@ -22,31 +20,27 @@ export class SupabaseService {
     });
   }
 
-  get client(): SupabaseClient {
+  public get client(): SupabaseClient {
     return this.supabase;
   }
 
-  get currentUser() {
-    return this._session$.value?.user ?? null;
-  }
-
-  signUp(email: string, password: string) {
+  public signUp(email: string, password: string) {
     return this.supabase.auth.signUp({ email, password });
   }
 
-  signIn(email: string, password: string) {
+  public signIn(email: string, password: string) {
     return this.supabase.auth.signInWithPassword({ email, password });
   }
 
-  signOut() {
+  public signOut() {
     return this.supabase.auth.signOut();
   }
 
-  resetPasswordForEmail(email: string) {
+  public resetPasswordForEmail(email: string) {
     return this.supabase.auth.resetPasswordForEmail(email);
   }
 
-  updatePassword(password: string) {
+  public updatePassword(password: string) {
     return this.supabase.auth.updateUser({ password });
   }
 }
