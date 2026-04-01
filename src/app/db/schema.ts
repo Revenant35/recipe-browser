@@ -1,5 +1,6 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { relations } from 'drizzle-orm';
+import { DrizzleAppSchema } from '@powersync/drizzle-driver';
 
 export const profiles = sqliteTable('profiles', {
   id: text('id').primaryKey().notNull(),
@@ -111,3 +112,24 @@ export const recipeNotesRelations = relations(recipeNotes, ({ one }) => ({
     references: [recipes.id],
   }),
 }));
+
+// DrizzleAppSchema
+
+export const drizzleSchema = {
+  profiles,
+  profilesRelations,
+  recipeSections,
+  recipeSectionsRelations,
+  recipeDifficulties,
+  recipeDifficultiesRelations,
+  recipes,
+  recipesRelations,
+  recipeIngredients,
+  recipeIngredientsRelations,
+  recipeInstructions,
+  recipeInstructionsRelations,
+  recipeNotes,
+  recipeNotesRelations,
+};
+
+export const AppSchema = new DrizzleAppSchema(drizzleSchema);

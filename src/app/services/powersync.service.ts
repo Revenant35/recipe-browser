@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { PowerSyncDatabase } from '@powersync/web';
 import { wrapPowerSyncWithDrizzle, type PowerSyncSQLiteDatabase } from '@powersync/drizzle-driver';
-import { AppSchema, drizzleSchema } from '../db/app-schema';
+import { AppSchema, drizzleSchema } from '../db';
 import { SupabaseConnector } from './supabase-connector';
 import { SupabaseService } from './supabase.service';
 import { environment } from '../../environments/environment';
