@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
@@ -13,12 +13,10 @@ import { PowerSyncService } from './services/powersync.service';
   imports: [IonApp, IonRouterOutlet],
 })
 export class AppComponent implements OnInit, OnDestroy {
-  private sessionSub!: Subscription;
+  private readonly supabaseService = inject(SupabaseService);
+  private readonly powerSyncService = inject(PowerSyncService);
 
-  constructor(
-    private supabaseService: SupabaseService,
-    private powerSyncService: PowerSyncService,
-  ) {}
+  private sessionSub!: Subscription;
 
   ngOnInit(): void {
     this.sessionSub = this.supabaseService.session$
