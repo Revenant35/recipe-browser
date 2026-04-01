@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient, Session } from '@supabase/supabase-js';
-import { BehaviorSubject } from 'rxjs';
+import { ReplaySubject } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class SupabaseService {
   private readonly supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
-  private readonly _session$ = new BehaviorSubject<Session | null>(null);
+  private readonly _session$ = new ReplaySubject<Session | null>(1);
 
   public readonly session$ = this._session$.asObservable();
 
