@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { eq } from 'drizzle-orm';
 import { PowerSyncService } from './powersync.service';
-import { recipes } from '../db/schema';
+import { recipes } from '@app/db/schema';
+import { RecipeWithDetails } from '@app/models';
 
 @Injectable({ providedIn: 'root' })
 export class RecipeService {
@@ -11,7 +12,7 @@ export class RecipeService {
     return this.powerSync.drizzle;
   }
 
-  getRecipes() {
+  getRecipes(): Promise<RecipeWithDetails[]> {
     return this.db.query.recipes.findMany({
       with: {
         section: true,
@@ -23,7 +24,7 @@ export class RecipeService {
     });
   }
 
-  getRecipe(id: string) {
+  getRecipe(id: string): Promise<RecipeWithDetails | undefined> {
     return this.db.query.recipes.findFirst({
       where: eq(recipes.id, id),
       with: {
