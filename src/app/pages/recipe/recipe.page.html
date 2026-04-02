@@ -17,6 +17,13 @@
   <div class="recipe-content">
     <p class="description">{{ recipe().description }}</p>
 
+    <div class="author">
+      <ion-avatar>
+        <img [src]="author().avatar_url" />
+      </ion-avatar>
+      <span>{{ author().full_name || author().username }}</span>
+    </div>
+
     <div class="metadata">
       @if (recipe().difficultyLevel; as difficulty) {
         <ion-chip>{{ difficulty.name }}</ion-chip>

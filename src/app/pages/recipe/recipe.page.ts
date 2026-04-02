@@ -12,8 +12,9 @@ import {
   IonLabel,
   IonNote,
   IonChip,
+  IonAvatar,
 } from '@ionic/angular/standalone';
-import { RecipeWithDetails } from '@app/models';
+import { RecipeWithDetails, Profile } from '@app/models';
 
 @Component({
   selector: 'app-recipe',
@@ -32,10 +33,12 @@ import { RecipeWithDetails } from '@app/models';
     IonLabel,
     IonNote,
     IonChip,
+    IonAvatar,
   ],
 })
 export class RecipePage {
   recipe = input.required<RecipeWithDetails>();
+  author = input.required<Profile>();
 
   totalTime = computed(() => {
     const prep = this.recipe()?.prep_time_minutes;

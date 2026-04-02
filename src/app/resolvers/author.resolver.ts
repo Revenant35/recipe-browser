@@ -1,0 +1,30 @@
+import { inject } from '@angular/core';
+import { ResolveFn } from '@angular/router';
+import { RecipeService } from '@app/services/recipe.service';
+import { ProfileService } from '@app/services/profile.service';
+import { Profile } from '@app/models';
+
+export const authorResolver: ResolveFn<Profile> = async (route) => {
+  const recipeService = inject(RecipeService);
+  const profileService = inject(ProfileService);
+
+  const id = route.paramMap.get('id');
+
+  if (!id) {
+    throw new Error('Missing required route parameter: id');
+  }
+
+  const recipe = await recipeService.getRecipe(id);
+
+  if (!recipe) {
+    throw new Error(`Recipe not found: ${id}`);
+  }
+
+  const profile = await profileService.getProfile(recipe.user_id);
+
+  if (!profile) {
+    throw new Error(`Profile not found for user: ${recipe.user_id}`);
+  }
+
+  return profile;
+};
