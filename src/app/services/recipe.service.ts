@@ -21,6 +21,23 @@ export interface CreateRecipeInput {
   instructions?: string[];
 }
 
+export interface UpdateRecipeInput {
+  id: string;
+  name: string;
+  description: string;
+  servings?: number;
+  prep_time_minutes?: number;
+  cook_time_minutes?: number;
+  source?: string;
+  difficulty?: string;
+  carbs_grams?: number;
+  protein_grams?: number;
+  fat_grams?: number;
+  calories?: number;
+  ingredients?: string[];
+  instructions?: string[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class RecipeService {
   private powerSync = inject(PowerSyncService);
@@ -91,6 +108,43 @@ export class RecipeService {
     }
 
     return recipeId;
+  }
+
+  async updateRecipe(input: UpdateRecipeInput): Promise<void> {
+    const { id, ingredients, instructions, ...recipeData } = input;
+    const now = new Date().toISOString();
+
+    await this.db
+      .update(recipes)
+      .set(recipeData)
+      .where(eq(recipes.id, id));
+
+    await this.db.delete(recipeIngredients).where(eq(recipeIngredients.recipe_id, id));
+    await this.db.delete(recipeInstructions).where(eq(recipeInstructions.recipe_id, id));
+
+    if (ingredients?.length) {
+      await this.db.insert(recipeIngredients).values(
+        ingredients.map((value, index) => ({
+          id: crypto.randomUUID(),
+          created_at: now,
+          recipe_id: id,
+          value,
+          order: index,
+        })),
+      );
+    }
+
+    if (instructions?.length) {
+      await this.db.insert(recipeInstructions).values(
+        instructions.map((value, index) => ({
+          id: crypto.randomUUID(),
+          created_at: now,
+          recipe_id: id,
+          value,
+          order: index,
+        })),
+      );
+    }
   }
 
   getDifficulties(): Promise<RecipeDifficulty[]> {

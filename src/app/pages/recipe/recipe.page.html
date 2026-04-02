@@ -4,6 +4,13 @@
       <ion-back-button defaultHref="/home"></ion-back-button>
     </ion-buttons>
     <ion-title>{{ recipe().name }}</ion-title>
+    @if (isOwner()) {
+      <ion-buttons slot="end">
+        <ion-button [routerLink]="'/recipes/' + recipe().id + '/edit'">
+          <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    }
   </ion-toolbar>
 </ion-header>
 

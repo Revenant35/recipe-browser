@@ -15,6 +15,12 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'recipes/:id/edit',
+    loadComponent: () => import('./pages/edit-recipe/edit-recipe.page').then((m) => m.EditRecipePage),
+    canActivate: [authGuard],
+    resolve: { recipe: recipeResolver },
+  },
+  {
     path: 'recipes/:id',
     loadComponent: () => import('./pages/recipe/recipe.page').then((m) => m.RecipePage),
     canActivate: [authGuard],
