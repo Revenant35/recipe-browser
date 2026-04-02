@@ -21,14 +21,14 @@
     </ion-toolbar>
   </ion-header>
 
-  <div class="recipe-content">
+  <div class="p-4">
     @if (recipe().difficultyLevel || recipe().servings) {
-      <div class="subtitle">
+      <div class="flex items-center gap-2 text-[color:var(--ion-color-medium)] mb-3">
         @if (recipe().difficultyLevel; as difficulty) {
           <span>{{ difficulty.name }}</span>
         }
         @if (recipe().difficultyLevel && recipe().servings) {
-          <span class="dot">&middot;</span>
+          <span class="font-bold">&middot;</span>
         }
         @if (recipe().servings; as servings) {
           <span>{{ servings }} Servings</span>
@@ -36,9 +36,9 @@
       </div>
     }
 
-    <p class="description">{{ recipe().description }}</p>
+    <p class="text-[color:var(--ion-color-medium)] mb-4">{{ recipe().description }}</p>
 
-    <div class="author">
+    <div class="flex items-center gap-3 mb-4">
       <ion-avatar>
         <img [src]="author().avatar_url" />
       </ion-avatar>
@@ -46,7 +46,7 @@
     </div>
 
     @if (recipe().recipeTags.length) {
-      <div class="metadata">
+      <div class="flex flex-wrap gap-1 mb-4">
         @for (recipeTag of recipe().recipeTags; track recipeTag.id) {
           <ion-chip>{{ recipeTag.tag.name }}</ion-chip>
         }
@@ -54,54 +54,54 @@
     }
 
     @if (recipe().prep_time_minutes || recipe().cook_time_minutes) {
-      <div class="time-section">
+      <div class="flex gap-6 mb-4 p-3 bg-[var(--ion-color-light)] rounded-lg">
         @if (recipe().prep_time_minutes) {
-          <div class="time-item">
-            <span class="time-label">Prep</span>
-            <span class="time-value">{{ recipe().prep_time_minutes }} min</span>
+          <div class="flex flex-col items-center">
+            <span class="text-xs text-[color:var(--ion-color-medium)]">Prep</span>
+            <span class="font-semibold">{{ recipe().prep_time_minutes }} min</span>
           </div>
         }
         @if (recipe().cook_time_minutes) {
-          <div class="time-item">
-            <span class="time-label">Cook</span>
-            <span class="time-value">{{ recipe().cook_time_minutes }} min</span>
+          <div class="flex flex-col items-center">
+            <span class="text-xs text-[color:var(--ion-color-medium)]">Cook</span>
+            <span class="font-semibold">{{ recipe().cook_time_minutes }} min</span>
           </div>
         }
         @if (totalTime()) {
-          <div class="time-item">
-            <span class="time-label">Total</span>
-            <span class="time-value">{{ totalTime() }} min</span>
+          <div class="flex flex-col items-center">
+            <span class="text-xs text-(--ion-color-medium)">Total</span>
+            <span class="font-semibold">{{ totalTime() }} min</span>
           </div>
         }
       </div>
     }
 
     @if (recipe().calories || recipe().protein_grams || recipe().carbs_grams || recipe().fat_grams) {
-      <div class="nutrition-section">
-        <h3>Nutrition</h3>
-        <div class="nutrition-grid">
+      <div>
+        <h3 class="mt-4 mb-2">Nutrition</h3>
+        <div class="flex gap-6 p-3 bg-[var(--ion-color-light)] rounded-lg">
           @if (recipe().calories) {
-            <div class="nutrition-item">
-              <span class="nutrition-value">{{ recipe().calories }}</span>
-              <span class="nutrition-label">Calories</span>
+            <div class="flex flex-col items-center">
+              <span class="font-semibold">{{ recipe().calories }}</span>
+              <span class="text-xs text-[color:var(--ion-color-medium)]">Calories</span>
             </div>
           }
           @if (recipe().protein_grams) {
-            <div class="nutrition-item">
-              <span class="nutrition-value">{{ recipe().protein_grams }}g</span>
-              <span class="nutrition-label">Protein</span>
+            <div class="flex flex-col items-center">
+              <span class="font-semibold">{{ recipe().protein_grams }}g</span>
+              <span class="text-xs text-[color:var(--ion-color-medium)]">Protein</span>
             </div>
           }
           @if (recipe().carbs_grams) {
-            <div class="nutrition-item">
-              <span class="nutrition-value">{{ recipe().carbs_grams }}g</span>
-              <span class="nutrition-label">Carbs</span>
+            <div class="flex flex-col items-center">
+              <span class="font-semibold">{{ recipe().carbs_grams }}g</span>
+              <span class="text-xs text-[color:var(--ion-color-medium)]">Carbs</span>
             </div>
           }
           @if (recipe().fat_grams) {
-            <div class="nutrition-item">
-              <span class="nutrition-value">{{ recipe().fat_grams }}g</span>
-              <span class="nutrition-label">Fat</span>
+            <div class="flex flex-col items-center">
+              <span class="font-semibold">{{ recipe().fat_grams }}g</span>
+              <span class="text-xs text-[color:var(--ion-color-medium)]">Fat</span>
             </div>
           }
         </div>
@@ -109,8 +109,8 @@
     }
 
     @if (recipe().ingredients.length) {
-      <div class="ingredients-section">
-        <h3>Ingredients</h3>
+      <div>
+        <h3 class="mt-4 mb-2">Ingredients</h3>
         <ion-list>
           @for (ingredient of recipe().ingredients; track ingredient.id) {
             <ion-item>
@@ -122,8 +122,8 @@
     }
 
     @if (recipe().instructions.length) {
-      <div class="instructions-section">
-        <h3>Instructions</h3>
+      <div>
+        <h3 class="mt-4 mb-2">Instructions</h3>
         <ion-list>
           @for (instruction of recipe().instructions; track instruction.id; let i = $index) {
             <ion-item>
@@ -136,8 +136,8 @@
     }
 
     @if (recipe().notes.length) {
-      <div class="notes-section">
-        <h3>Notes</h3>
+      <div>
+        <h3 class="mt-4 mb-2">Notes</h3>
         <ion-list>
           @for (note of recipe().notes; track note.id) {
             <ion-item>
