@@ -6,11 +6,8 @@
     <ion-title>{{ recipe().name }}</ion-title>
     @if (isOwner()) {
       <ion-buttons slot="end">
-        <ion-button [routerLink]="'/recipes/' + recipe().id + '/edit'">
-          <ion-icon slot="icon-only" name="create-outline"></ion-icon>
-        </ion-button>
-        <ion-button (click)="deleteRecipe()" color="danger">
-          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        <ion-button (click)="openActions()">
+          <ion-icon slot="icon-only" name="ellipsis-horizontal"></ion-icon>
         </ion-button>
       </ion-buttons>
     }

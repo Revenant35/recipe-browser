@@ -1,5 +1,5 @@
 import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
 import {
@@ -18,9 +18,9 @@ import {
   IonChip,
   IonAvatar,
 } from '@ionic/angular/standalone';
-import { AlertController, ToastController } from '@ionic/angular';
+import { ActionSheetController, AlertController, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { createOutline, trashOutline } from 'ionicons/icons';
+import { createOutline, ellipsisHorizontal, trashOutline } from 'ionicons/icons';
 import { RecipeWithDetails, Profile } from '@app/models';
 import { RecipeService } from '@app/services/recipe.service';
 import { SupabaseService } from '@app/services/supabase.service';
@@ -31,7 +31,6 @@ import { SupabaseService } from '@app/services/supabase.service';
   styleUrls: ['recipe.page.scss'],
   standalone: true,
   imports: [
-    RouterLink,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -51,6 +50,7 @@ import { SupabaseService } from '@app/services/supabase.service';
 export class RecipePage implements OnInit {
   private supabase = inject(SupabaseService);
   private recipeService = inject(RecipeService);
+  private actionSheetCtrl = inject(ActionSheetController);
   private alertCtrl = inject(AlertController);
   private toastCtrl = inject(ToastController);
   private router = inject(Router);
@@ -68,12 +68,37 @@ export class RecipePage implements OnInit {
   });
 
   constructor() {
-    addIcons({ createOutline, trashOutline });
+    addIcons({ createOutline, ellipsisHorizontal, trashOutline });
   }
 
   async ngOnInit() {
     const session = await firstValueFrom(this.supabase.session$);
     this.isOwner.set(session?.user?.id === this.recipe().user_id);
+  }
+
+  async openActions() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Recipe Actions',
+      buttons: [
+        {
+          text: 'Edit',
+          icon: 'create-outline',
+          handler: () => {
+            this.router.navigate(['/recipes', this.recipe().id, 'edit']);
+          },
+        },
+        {
+          text: 'Delete',
+          role: 'destructive',
+          icon: 'trash-outline',
+          handler: () => {
+            this.deleteRecipe();
+          },
+        },
+        { text: 'Cancel', role: 'cancel' },
+      ],
+    });
+    await actionSheet.present();
   }
 
   async deleteRecipe() {
