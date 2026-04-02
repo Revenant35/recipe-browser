@@ -10,6 +10,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'recipes/create',
+    loadComponent: () => import('./pages/create-recipe/create-recipe.page').then((m) => m.CreateRecipePage),
+    canActivate: [authGuard],
+  },
+  {
     path: 'recipes/:id',
     loadComponent: () => import('./pages/recipe/recipe.page').then((m) => m.RecipePage),
     canActivate: [authGuard],

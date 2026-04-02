@@ -1,0 +1,18 @@
+ion-list {
+  margin-bottom: 16px;
+}
+
+ion-item {
+  --padding-start: 0;
+}
+
+.nutrition-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0 16px;
+}
+
+.submit-button {
+  margin-top: 24px;
+}

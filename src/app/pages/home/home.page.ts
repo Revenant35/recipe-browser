@@ -1,5 +1,6 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { ViewWillEnter } from '@ionic/angular';
 import {
   IonHeader,
   IonToolbar,
@@ -14,7 +15,7 @@ import {
   IonNote,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { logOutOutline } from 'ionicons/icons';
+import { addOutline, logOutOutline } from 'ionicons/icons';
 import { SupabaseService } from '@app/services/supabase.service';
 import { RecipeService } from '@app/services/recipe.service';
 import { RecipeWithDetails } from '@app/models';
@@ -38,7 +39,7 @@ import { RecipeWithDetails } from '@app/models';
     IonNote,
   ],
 })
-export class HomePage implements OnInit {
+export class HomePage implements ViewWillEnter {
   private supabase = inject(SupabaseService);
   private recipeService = inject(RecipeService);
   private router = inject(Router);
@@ -46,16 +47,20 @@ export class HomePage implements OnInit {
   recipes = signal<RecipeWithDetails[]>([]);
 
   constructor() {
-    addIcons({ logOutOutline });
+    addIcons({ addOutline, logOutOutline });
   }
 
-  async ngOnInit() {
+  async ionViewWillEnter() {
     const recipes = await this.recipeService.getRecipes();
     this.recipes.set(recipes);
   }
 
   async openRecipe(id: string) {
     await this.router.navigateByUrl(`/recipes/${id}`);
+  }
+
+  async createRecipe() {
+    await this.router.navigateByUrl('/recipes/create');
   }
 
   async logout() {
