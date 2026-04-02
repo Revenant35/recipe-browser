@@ -22,6 +22,20 @@
   </ion-header>
 
   <div class="recipe-content">
+    @if (recipe().difficultyLevel || recipe().servings) {
+      <div class="subtitle">
+        @if (recipe().difficultyLevel; as difficulty) {
+          <span>{{ difficulty.name }}</span>
+        }
+        @if (recipe().difficultyLevel && recipe().servings) {
+          <span class="dot">&middot;</span>
+        }
+        @if (recipe().servings; as servings) {
+          <span>{{ servings }} Servings</span>
+        }
+      </div>
+    }
+
     <p class="description">{{ recipe().description }}</p>
 
     <div class="author">
@@ -31,17 +45,13 @@
       <span>{{ author().full_name || author().username }}</span>
     </div>
 
-    <div class="metadata">
-      @if (recipe().difficultyLevel; as difficulty) {
-        <ion-chip>{{ difficulty.name }}</ion-chip>
-      }
-      @for (recipeTag of recipe().recipeTags; track recipeTag.id) {
-        <ion-chip>{{ recipeTag.tag.name }}</ion-chip>
-      }
-      @if (recipe().servings; as servings) {
-        <ion-chip>{{ servings }} servings</ion-chip>
-      }
-    </div>
+    @if (recipe().recipeTags.length) {
+      <div class="metadata">
+        @for (recipeTag of recipe().recipeTags; track recipeTag.id) {
+          <ion-chip>{{ recipeTag.tag.name }}</ion-chip>
+        }
+      </div>
+    }
 
     @if (recipe().prep_time_minutes || recipe().cook_time_minutes) {
       <div class="time-section">

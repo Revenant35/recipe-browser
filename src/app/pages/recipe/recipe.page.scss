@@ -14,6 +14,18 @@
   margin-bottom: 16px;
 }
 
+.subtitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ion-color-medium);
+  margin-bottom: 12px;
+
+  .dot {
+    font-weight: 700;
+  }
+}
+
 .metadata {
   display: flex;
   flex-wrap: wrap;
