@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { asc, eq } from 'drizzle-orm';
 import { PowerSyncService } from './powersync.service';
-import { recipes, recipeIngredients, recipeInstructions, recipeDifficulties } from '@app/db/schema';
+import { recipes, recipeIngredients, recipeInstructions, recipeNotes, recipeTags, recipeDifficulties } from '@app/db/schema';
 import { RecipeWithDetails, RecipeDifficulty } from '@app/models';
 
 export interface CreateRecipeInput {
@@ -145,6 +145,14 @@ export class RecipeService {
         })),
       );
     }
+  }
+
+  async deleteRecipe(id: string): Promise<void> {
+    await this.db.delete(recipeIngredients).where(eq(recipeIngredients.recipe_id, id));
+    await this.db.delete(recipeInstructions).where(eq(recipeInstructions.recipe_id, id));
+    await this.db.delete(recipeNotes).where(eq(recipeNotes.recipe_id, id));
+    await this.db.delete(recipeTags).where(eq(recipeTags.recipe_id, id));
+    await this.db.delete(recipes).where(eq(recipes.id, id));
   }
 
   getDifficulties(): Promise<RecipeDifficulty[]> {

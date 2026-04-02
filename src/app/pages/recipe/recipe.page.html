@@ -9,6 +9,9 @@
         <ion-button [routerLink]="'/recipes/' + recipe().id + '/edit'">
           <ion-icon slot="icon-only" name="create-outline"></ion-icon>
         </ion-button>
+        <ion-button (click)="deleteRecipe()" color="danger">
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        </ion-button>
       </ion-buttons>
     }
   </ion-toolbar>
