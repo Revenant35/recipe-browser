@@ -1,0 +1,200 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+
+  <!-- Basic Info -->
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Basic Info</ion-label>
+    </ion-list-header>
+
+    <ion-item>
+      <ion-input
+        label="Name"
+        labelPlacement="floating"
+        fill="outline"
+        formControlName="name"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-textarea
+        label="Description"
+        labelPlacement="floating"
+        fill="outline"
+        formControlName="description"
+        [autoGrow]="true"
+      ></ion-textarea>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        label="Source"
+        labelPlacement="floating"
+        fill="outline"
+        formControlName="source"
+      ></ion-input>
+    </ion-item>
+  </ion-list>
+
+  <!-- Timing & Servings -->
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Timing & Servings</ion-label>
+    </ion-list-header>
+
+    <ion-item>
+      <ion-input
+        label="Servings"
+        labelPlacement="floating"
+        fill="outline"
+        type="number"
+        formControlName="servings"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        label="Prep Time (minutes)"
+        labelPlacement="floating"
+        fill="outline"
+        type="number"
+        formControlName="prep_time_minutes"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-input
+        label="Cook Time (minutes)"
+        labelPlacement="floating"
+        fill="outline"
+        type="number"
+        formControlName="cook_time_minutes"
+      ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-select
+        label="Difficulty"
+        labelPlacement="floating"
+        fill="outline"
+        formControlName="difficulty"
+      >
+        @for (d of difficulties(); track d.id) {
+          <ion-select-option [value]="d.id">{{ d.name }}</ion-select-option>
+        }
+      </ion-select>
+    </ion-item>
+  </ion-list>
+
+  <!-- Ingredients -->
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Ingredients</ion-label>
+      <ion-button fill="clear" (click)="addIngredient()">
+        <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+      </ion-button>
+    </ion-list-header>
+
+    <ion-reorder-group [disabled]="false" (ionItemReorder)="reorderIngredients($any($event))">
+      @for (ctrl of ingredients.controls; track $index) {
+        <ion-item>
+          <ion-reorder slot="start"></ion-reorder>
+          <ion-input
+            [placeholder]="'Ingredient ' + ($index + 1)"
+            [formControl]="ctrl"
+          ></ion-input>
+          <ion-button slot="end" fill="clear" color="danger" (click)="removeIngredient($index)">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-button>
+        </ion-item>
+      }
+    </ion-reorder-group>
+  </ion-list>
+
+  <!-- Instructions -->
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Instructions</ion-label>
+      <ion-button fill="clear" (click)="addInstruction()">
+        <ion-icon slot="icon-only" name="add-outline"></ion-icon>
+      </ion-button>
+    </ion-list-header>
+
+    <ion-reorder-group [disabled]="false" (ionItemReorder)="reorderInstructions($any($event))">
+      @for (ctrl of instructions.controls; track $index) {
+        <ion-item>
+          <ion-reorder slot="start"></ion-reorder>
+          <ion-textarea
+            [placeholder]="'Step ' + ($index + 1)"
+            [formControl]="ctrl"
+            [autoGrow]="true"
+          ></ion-textarea>
+          <ion-button slot="end" fill="clear" color="danger" (click)="removeInstruction($index)">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-button>
+        </ion-item>
+      }
+    </ion-reorder-group>
+  </ion-list>
+
+  <!-- Nutrition -->
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Nutrition (optional)</ion-label>
+    </ion-list-header>
+
+    <div class="grid grid-cols-2 gap-2 px-4">
+      <ion-item>
+        <ion-input
+          label="Calories"
+          labelPlacement="floating"
+          fill="outline"
+          type="number"
+          formControlName="calories"
+        ></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input
+          label="Protein (g)"
+          labelPlacement="floating"
+          fill="outline"
+          type="number"
+          formControlName="protein_grams"
+        ></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input
+          label="Carbs (g)"
+          labelPlacement="floating"
+          fill="outline"
+          type="number"
+          formControlName="carbs_grams"
+        ></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input
+          label="Fat (g)"
+          labelPlacement="floating"
+          fill="outline"
+          type="number"
+          formControlName="fat_grams"
+        ></ion-input>
+      </ion-item>
+    </div>
+  </ion-list>
+
+  <!-- Submit -->
+  <ion-button
+    expand="block"
+    type="submit"
+    [disabled]="loading() || form.invalid"
+    class="mt-6"
+  >
+    @if (loading()) {
+      <ion-spinner name="crescent"></ion-spinner>
+    } @else {
+      <ion-icon slot="start" name="save-outline"></ion-icon>
+      {{ submitLabel() }}
+    }
+  </ion-button>
+
+</form>
