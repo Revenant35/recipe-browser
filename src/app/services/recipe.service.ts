@@ -15,7 +15,7 @@ export class RecipeService {
   getRecipes(): Promise<RecipeWithDetails[]> {
     return this.db.query.recipes.findMany({
       with: {
-        section: true,
+        recipeTags: { with: { tag: true } },
         difficultyLevel: true,
         ingredients: { orderBy: asc(recipeIngredients.order) },
         instructions: { orderBy: asc(recipeInstructions.order) },
@@ -28,7 +28,7 @@ export class RecipeService {
     return this.db.query.recipes.findFirst({
       where: eq(recipes.id, id),
       with: {
-        section: true,
+        recipeTags: { with: { tag: true } },
         difficultyLevel: true,
         ingredients: { orderBy: asc(recipeIngredients.order) },
         instructions: { orderBy: asc(recipeInstructions.order) },

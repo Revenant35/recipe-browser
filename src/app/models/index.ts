@@ -2,7 +2,8 @@ import { InferSelectModel } from 'drizzle-orm';
 import {
   profiles,
   recipes,
-  recipeSections,
+  tags,
+  recipeTags,
   recipeDifficulties,
   recipeIngredients,
   recipeInstructions,
@@ -11,14 +12,15 @@ import {
 
 export type Profile = InferSelectModel<typeof profiles>;
 export type Recipe = InferSelectModel<typeof recipes>;
-export type RecipeSection = InferSelectModel<typeof recipeSections>;
+export type Tag = InferSelectModel<typeof tags>;
+export type RecipeTag = InferSelectModel<typeof recipeTags>;
 export type RecipeDifficulty = InferSelectModel<typeof recipeDifficulties>;
 export type RecipeIngredient = InferSelectModel<typeof recipeIngredients>;
 export type RecipeInstruction = InferSelectModel<typeof recipeInstructions>;
 export type RecipeNote = InferSelectModel<typeof recipeNotes>;
 
 export interface RecipeWithDetails extends Recipe {
-  section: RecipeSection | null;
+  recipeTags: (RecipeTag & { tag: Tag })[];
   difficultyLevel: RecipeDifficulty | null;
   ingredients: RecipeIngredient[];
   instructions: RecipeInstruction[];

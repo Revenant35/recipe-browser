@@ -21,8 +21,8 @@
       @if (recipe().difficultyLevel; as difficulty) {
         <ion-chip>{{ difficulty.name }}</ion-chip>
       }
-      @if (recipe().section; as section) {
-        <ion-chip>{{ section.name }}</ion-chip>
+      @for (recipeTag of recipe().recipeTags; track recipeTag.id) {
+        <ion-chip>{{ recipeTag.tag.name }}</ion-chip>
       }
       @if (recipe().servings; as servings) {
         <ion-chip>{{ servings }} servings</ion-chip>

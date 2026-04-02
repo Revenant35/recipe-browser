@@ -23,7 +23,6 @@
       <ion-item [button]="true" (click)="openRecipe(recipe.id)">
         <ion-label>
           {{ recipe.name }}
-          <ion-note>{{ recipe.section?.name }}</ion-note>
         </ion-label>
         <ion-note slot="end">{{ recipe.difficultyLevel?.name }}</ion-note>
       </ion-item>

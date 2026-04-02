@@ -11,11 +11,18 @@ export const profiles = sqliteTable('profiles', {
   website: text('website'),
 });
 
-export const recipeSections = sqliteTable('recipe_sections', {
+export const tags = sqliteTable('tags', {
   id: text('id').primaryKey().notNull(),
   created_at: text('created_at'),
   name: text('name').notNull(),
   user_id: text('user_id').notNull(),
+});
+
+export const recipeTags = sqliteTable('recipe_tags', {
+  id: text('id').primaryKey().notNull(),
+  created_at: text('created_at'),
+  recipe_id: text('recipe_id').notNull(),
+  tag_id: text('tag_id').notNull(),
 });
 
 export const recipeDifficulties = sqliteTable('recipe_difficulties', {
@@ -29,7 +36,7 @@ export const recipes = sqliteTable('recipes', {
   created_at: text('created_at'),
   name: text('name').notNull(),
   user_id: text('user_id').notNull(),
-  section_id: text('section_id'),
+
   servings: integer('servings'),
   prep_time_minutes: integer('prep_time_minutes'),
   cook_time_minutes: integer('cook_time_minutes'),
@@ -70,8 +77,19 @@ export const recipeNotes = sqliteTable('recipe_notes', {
 
 export const profilesRelations = relations(profiles, () => ({}));
 
-export const recipeSectionsRelations = relations(recipeSections, ({ many }) => ({
-  recipes: many(recipes),
+export const tagsRelations = relations(tags, ({ many }) => ({
+  recipeTags: many(recipeTags),
+}));
+
+export const recipeTagsRelations = relations(recipeTags, ({ one }) => ({
+  recipe: one(recipes, {
+    fields: [recipeTags.recipe_id],
+    references: [recipes.id],
+  }),
+  tag: one(tags, {
+    fields: [recipeTags.tag_id],
+    references: [tags.id],
+  }),
 }));
 
 export const recipeDifficultiesRelations = relations(recipeDifficulties, ({ many }) => ({
@@ -79,10 +97,7 @@ export const recipeDifficultiesRelations = relations(recipeDifficulties, ({ many
 }));
 
 export const recipesRelations = relations(recipes, ({ one, many }) => ({
-  section: one(recipeSections, {
-    fields: [recipes.section_id],
-    references: [recipeSections.id],
-  }),
+  recipeTags: many(recipeTags),
   difficultyLevel: one(recipeDifficulties, {
     fields: [recipes.difficulty],
     references: [recipeDifficulties.id],
@@ -118,8 +133,10 @@ export const recipeNotesRelations = relations(recipeNotes, ({ one }) => ({
 export const drizzleSchema = {
   profiles,
   profilesRelations,
-  recipeSections,
-  recipeSectionsRelations,
+  tags,
+  tagsRelations,
+  recipeTags,
+  recipeTagsRelations,
   recipeDifficulties,
   recipeDifficultiesRelations,
   recipes,
