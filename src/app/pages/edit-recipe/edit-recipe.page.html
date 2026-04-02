@@ -152,7 +152,7 @@
         <ion-label>Nutrition (optional)</ion-label>
       </ion-list-header>
 
-      <div class="nutrition-grid">
+      <div class="grid grid-cols-2 gap-2 px-4">
         <ion-item>
           <ion-input
             label="Calories"
@@ -197,7 +197,7 @@
       expand="block"
       type="submit"
       [disabled]="loading() || form.invalid"
-      class="submit-button"
+      class="mt-6"
     >
       @if (loading()) {
         <ion-spinner name="crescent"></ion-spinner>
