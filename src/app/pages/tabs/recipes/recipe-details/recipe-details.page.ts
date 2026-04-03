@@ -139,7 +139,7 @@ export class RecipeDetailsPage implements OnInit {
           handler: async () => {
             try {
               await this.recipeService.deleteRecipe(this.recipe().id);
-              this.router.navigate(['/home']);
+              this.router.navigate(['/recipes']);
             } catch {
               const toast = await this.toastCtrl.create({
                 message: 'Failed to delete recipe.',
