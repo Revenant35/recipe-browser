@@ -17,4 +17,17 @@ export class ProfileService {
       where: eq(profiles.id, userId),
     });
   }
+
+  async updateProfile(
+    userId: string,
+    data: Pick<Profile, 'full_name' | 'username' | 'website'>,
+  ): Promise<void> {
+    await this.db
+      .update(profiles)
+      .set({
+        ...data,
+        updated_at: new Date().toISOString(),
+      })
+      .where(eq(profiles.id, userId));
+  }
 }

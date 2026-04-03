@@ -12,6 +12,10 @@
   </ion-header>
 
   <ion-list>
+    <ion-item [button]="true" routerLink="/settings/account">
+      <ion-icon slot="start" name="person-outline"></ion-icon>
+      <ion-label>Account</ion-label>
+    </ion-item>
     <ion-item [button]="true" (click)="logout()" [detail]="false">
       <ion-icon slot="start" name="log-out-outline"></ion-icon>
       <ion-label>Sign Out</ion-label>
