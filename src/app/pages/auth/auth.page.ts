@@ -6,7 +6,7 @@ import { IonContent } from '@ionic/angular/standalone';
   selector: 'app-auth-layout',
   standalone: true,
   imports: [RouterOutlet, IonContent],
-  templateUrl: './auth.layout.html',
-  styleUrl: './auth.layout.scss',
+  templateUrl: './auth.page.html',
+  styleUrl: './auth.page.scss',
 })
-export class AuthLayout {}
+export class AuthPage {}
