@@ -3,11 +3,6 @@
     <ion-title>
       Recipes
     </ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="createRecipe()">
-        <ion-icon slot="icon-only" name="add-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -53,4 +48,10 @@
       }
     </ion-list>
   }
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="createRecipe()">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
