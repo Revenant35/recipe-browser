@@ -15,6 +15,7 @@ import {
   IonItem,
   IonLabel,
   IonNote,
+  IonCheckbox,
   IonChip,
   IonAvatar,
 } from '@ionic/angular/standalone';
@@ -42,6 +43,7 @@ import { SupabaseService } from '@app/services/supabase.service';
     IonItem,
     IonLabel,
     IonNote,
+    IonCheckbox,
     IonChip,
     IonAvatar,
   ],
@@ -58,6 +60,7 @@ export class RecipeDetailsPage implements OnInit {
   author = input.required<Profile>();
 
   protected isOwner = signal(false);
+  protected checkedIngredients = signal(new Set<string>());
 
   totalTime = computed(() => {
     const prep = this.recipe()?.prep_time_minutes;
@@ -73,6 +76,18 @@ export class RecipeDetailsPage implements OnInit {
   async ngOnInit() {
     const session = await firstValueFrom(this.supabase.session$);
     this.isOwner.set(session?.user?.id === this.recipe().user_id);
+  }
+
+  protected toggleIngredient(id: string) {
+    this.checkedIngredients.update((set) => {
+      const next = new Set(set);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
   }
 
   async openActions() {

@@ -111,10 +111,15 @@
     @if (recipe().ingredients.length) {
       <div>
         <h3 class="mt-4 mb-2">Ingredients</h3>
-        <ion-list>
+        <ion-list [inset]="true" lines="full">
           @for (ingredient of recipe().ingredients; track ingredient.id) {
-            <ion-item>
-              <ion-label>{{ ingredient.value }}</ion-label>
+            <ion-item (click)="toggleIngredient(ingredient.id)">
+              <ion-checkbox
+                labelPlacement="end"
+                [checked]="checkedIngredients().has(ingredient.id)"
+                [class.line-through]="checkedIngredients().has(ingredient.id)"
+                [class.opacity-50]="checkedIngredients().has(ingredient.id)"
+              >{{ ingredient.value }}</ion-checkbox>
             </ion-item>
           }
         </ion-list>
