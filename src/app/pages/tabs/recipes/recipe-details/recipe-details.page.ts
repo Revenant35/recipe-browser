@@ -26,9 +26,8 @@ import { RecipeService } from '@app/services/recipe.service';
 import { SupabaseService } from '@app/services/supabase.service';
 
 @Component({
-  selector: 'app-recipe',
-  templateUrl: 'recipe.page.html',
-  styleUrls: ['recipe.page.scss'],
+  selector: 'app-recipe-details',
+  templateUrl: 'recipe-details.page.html',
   standalone: true,
   imports: [
     IonHeader,
@@ -47,7 +46,7 @@ import { SupabaseService } from '@app/services/supabase.service';
     IonAvatar,
   ],
 })
-export class RecipePage implements OnInit {
+export class RecipeDetailsPage implements OnInit {
   private supabase = inject(SupabaseService);
   private recipeService = inject(RecipeService);
   private actionSheetCtrl = inject(ActionSheetController);

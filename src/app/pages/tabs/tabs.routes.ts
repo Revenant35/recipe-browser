@@ -2,16 +2,16 @@ import { Routes } from '@angular/router';
 
 export const tabsRoutes: Routes = [
   {
-    path: 'home',
-    loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
+    path: 'recipes',
+    loadChildren: () => import('./recipes/recipes.routes').then((r) => r.recipesRoutes),
   },
   {
     path: 'explore',
-    loadComponent: () => import('./explore/explore.page').then((m) => m.ExplorePage),
+    loadComponent: () => import('./explore/explore.page').then((p) => p.ExplorePage),
   },
   {
     path: 'settings',
-    loadComponent: () => import('./settings/settings.page').then((m) => m.SettingsPage),
+    loadComponent: () => import('./settings/settings.page').then((p) => p.SettingsPage),
   },
   {
     path: '',

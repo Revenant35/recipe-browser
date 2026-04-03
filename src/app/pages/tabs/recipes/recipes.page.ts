@@ -21,9 +21,9 @@ import { addOutline } from 'ionicons/icons';
 import { RecipeService } from '@app/services/recipe.service';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: 'home.page.html',
-  styleUrls: ['home.page.scss'],
+  selector: 'app-recipes',
+  templateUrl: 'recipes.page.html',
+  styleUrls: ['recipes.page.scss'],
   standalone: true,
   imports: [
     IonHeader,
@@ -41,7 +41,7 @@ import { RecipeService } from '@app/services/recipe.service';
     IonSpinner,
   ],
 })
-export class HomePage implements ViewWillEnter {
+export class RecipesPage implements ViewWillEnter {
   private readonly recipeService = inject(RecipeService);
   private readonly router = inject(Router);
 

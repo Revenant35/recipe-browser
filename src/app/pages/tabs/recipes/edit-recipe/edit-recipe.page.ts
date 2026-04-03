@@ -1,4 +1,4 @@
-import { Component, inject, viewChild } from '@angular/core';
+import { Component, inject, input, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonHeader,
@@ -9,17 +9,12 @@ import {
   IonBackButton,
 } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
-import { firstValueFrom } from 'rxjs';
-
-import { SupabaseService } from '@app/services/supabase.service';
 import { RecipeService } from '@app/services/recipe.service';
-import {
-  RecipeFormComponent,
-  RecipeFormValue,
-} from '@app/forms/recipe-form/recipe-form.component';
+import { RecipeWithDetails } from '@app/models';
+import { RecipeFormComponent, RecipeFormValue } from '@app/forms/recipe-form/recipe-form.component';
 
 @Component({
-  selector: 'app-create-recipe',
+  selector: 'app-edit-recipe',
   standalone: true,
   imports: [
     IonHeader,
@@ -30,39 +25,33 @@ import {
     IonBackButton,
     RecipeFormComponent,
   ],
-  templateUrl: './create-recipe.page.html',
-  styleUrl: './create-recipe.page.scss',
+  templateUrl: './edit-recipe.page.html',
 })
-export class CreateRecipePage {
-  private supabase = inject(SupabaseService);
+export class EditRecipePage {
   private recipeService = inject(RecipeService);
   private toastCtrl = inject(ToastController);
   private router = inject(Router);
 
+  recipe = input.required<RecipeWithDetails>();
   private recipeForm = viewChild<RecipeFormComponent>('recipeForm');
 
   protected async submit(value: RecipeFormValue) {
     try {
-      const session = await firstValueFrom(this.supabase.session$);
-      if (!session?.user) {
-        throw new Error('You must be logged in to create a recipe.');
-      }
-
-      const recipeId = await this.recipeService.createRecipe({
+      await this.recipeService.updateRecipe({
+        id: this.recipe().id,
         ...value,
-        user_id: session.user.id,
       });
 
       const toast = await this.toastCtrl.create({
-        message: 'Recipe created!',
+        message: 'Recipe updated!',
         duration: 2000,
         color: 'success',
       });
       await toast.present();
-      await this.router.navigateByUrl(`/recipes/${recipeId}`);
+      await this.router.navigateByUrl(`/recipes/${this.recipe().id}`);
     } catch (err: any) {
       const toast = await this.toastCtrl.create({
-        message: err?.message ?? 'Failed to create recipe.',
+        message: err?.message ?? 'Failed to update recipe.',
         duration: 5000,
         color: 'danger',
       });
