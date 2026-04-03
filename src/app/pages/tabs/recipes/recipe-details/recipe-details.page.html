@@ -76,38 +76,6 @@
       </div>
     }
 
-    @if (recipe().calories || recipe().protein_grams || recipe().carbs_grams || recipe().fat_grams) {
-      <div>
-        <h3 class="mt-4 mb-2">Nutrition</h3>
-        <div class="flex gap-6 p-3 bg-[var(--ion-color-light)] rounded-lg">
-          @if (recipe().calories) {
-            <div class="flex flex-col items-center">
-              <span class="font-semibold">{{ recipe().calories }}</span>
-              <span class="text-xs text-[color:var(--ion-color-medium)]">Calories</span>
-            </div>
-          }
-          @if (recipe().protein_grams) {
-            <div class="flex flex-col items-center">
-              <span class="font-semibold">{{ recipe().protein_grams }}g</span>
-              <span class="text-xs text-[color:var(--ion-color-medium)]">Protein</span>
-            </div>
-          }
-          @if (recipe().carbs_grams) {
-            <div class="flex flex-col items-center">
-              <span class="font-semibold">{{ recipe().carbs_grams }}g</span>
-              <span class="text-xs text-[color:var(--ion-color-medium)]">Carbs</span>
-            </div>
-          }
-          @if (recipe().fat_grams) {
-            <div class="flex flex-col items-center">
-              <span class="font-semibold">{{ recipe().fat_grams }}g</span>
-              <span class="text-xs text-[color:var(--ion-color-medium)]">Fat</span>
-            </div>
-          }
-        </div>
-      </div>
-    }
-
     @if (recipe().ingredients.length) {
       <div>
         <div class="flex items-center justify-between mt-4 mb-2">
@@ -139,6 +107,42 @@
             <div class="p-3 bg-[var(--ion-color-light)] rounded-lg">
               <p class="text-xs font-semibold text-[color:var(--ion-color-medium)] mb-1">Step {{ i + 1 }}</p>
               <p>{{ instruction.value }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    @if (recipe().calories || recipe().protein_grams || recipe().carbs_grams || recipe().fat_grams) {
+      <div>
+        <h3 class="mt-4 mb-2">Nutrition</h3>
+        <div class="bg-[var(--ion-color-light)] rounded-lg overflow-hidden">
+          @if (recipe().calories) {
+            <div class="flex flex-col items-center py-3">
+              <span class="text-2xl font-bold">{{ recipe().calories }}</span>
+              <span class="text-xs text-[color:var(--ion-color-medium)]">Calories</span>
+            </div>
+          }
+          @if (recipe().protein_grams || recipe().carbs_grams || recipe().fat_grams) {
+            <div class="grid grid-cols-3 border-t border-[var(--ion-color-medium-shade)]/10">
+              @if (recipe().protein_grams) {
+                <div class="flex flex-col items-center py-3">
+                  <span class="font-semibold">{{ recipe().protein_grams }}g</span>
+                  <span class="text-xs text-[color:var(--ion-color-medium)]">Protein</span>
+                </div>
+              }
+              @if (recipe().carbs_grams) {
+                <div class="flex flex-col items-center py-3">
+                  <span class="font-semibold">{{ recipe().carbs_grams }}g</span>
+                  <span class="text-xs text-[color:var(--ion-color-medium)]">Carbs</span>
+                </div>
+              }
+              @if (recipe().fat_grams) {
+                <div class="flex flex-col items-center py-3">
+                  <span class="font-semibold">{{ recipe().fat_grams }}g</span>
+                  <span class="text-xs text-[color:var(--ion-color-medium)]">Fat</span>
+                </div>
+              }
             </div>
           }
         </div>
