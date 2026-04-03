@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { AttachmentQueue, type AttachmentRecord } from '@powersync/common';
 import { PowerSyncService } from './powersync.service';
 import { SupabaseService } from './supabase.service';
-import { SupabaseStorageAdapter } from './supabase-storage-adapter';
+import { SupabaseStorageAdapter, getPublicUrl } from './supabase-storage-adapter';
 import { CapacitorStorageAdapter } from './capacitor-storage-adapter';
 
 export interface SaveFileOptions {
@@ -43,6 +43,18 @@ export class AttachmentService {
       mediaType: options.mediaType,
       metaData,
     });
+  }
+
+  async uploadAvatar(userId: string, file: File): Promise<string> {
+    const ext = file.name.includes('.')
+      ? file.name.split('.').pop()!
+      : file.type.split('/')[1] || 'jpg';
+    const path = `${userId}.${ext}`;
+    const { error } = await this.supabaseService.client.storage
+      .from('avatars')
+      .upload(path, file, { upsert: true, contentType: file.type });
+    if (error) throw error;
+    return getPublicUrl(this.supabaseService.client, 'avatars', path);
   }
 
   async deleteFile(id: string, updateHook?: (transaction: any, attachment: AttachmentRecord) => Promise<void>): Promise<void> {

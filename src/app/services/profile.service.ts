@@ -20,7 +20,7 @@ export class ProfileService {
 
   async updateProfile(
     userId: string,
-    data: Pick<Profile, 'full_name' | 'username' | 'website'>,
+    data: Partial<Pick<Profile, 'full_name' | 'username' | 'website' | 'avatar_url'>>,
   ): Promise<void> {
     await this.db
       .update(profiles)

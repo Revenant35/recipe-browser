@@ -13,10 +13,13 @@ import {
   IonInput,
   IonButton,
   IonSpinner,
+  IonAvatar,
+  IonIcon,
 } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
 import { SupabaseService } from '@app/services/supabase.service';
 import { ProfileService } from '@app/services/profile.service';
+import { AttachmentService } from '@app/services/attachment.service';
 
 @Component({
   selector: 'app-account',
@@ -35,15 +38,20 @@ import { ProfileService } from '@app/services/profile.service';
     IonInput,
     IonButton,
     IonSpinner,
+    IonAvatar,
+    IonIcon,
   ],
 })
 export class AccountPage implements OnInit {
   private supabase = inject(SupabaseService);
   private profileService = inject(ProfileService);
+  private attachmentService = inject(AttachmentService);
   private toastCtrl = inject(ToastController);
 
   protected loading = signal(true);
   protected saving = signal(false);
+  protected avatarUrl = signal<string | null>(null);
+  protected uploadingAvatar = signal(false);
 
   protected profileForm = new FormGroup({
     full_name: new FormControl(''),
@@ -62,6 +70,7 @@ export class AccountPage implements OnInit {
         username: profile.username ?? '',
         website: profile.website ?? '',
       });
+      this.avatarUrl.set(profile.avatar_url);
     }
     this.loading.set(false);
   }
@@ -93,6 +102,43 @@ export class AccountPage implements OnInit {
       await toast.present();
     } finally {
       this.saving.set(false);
+    }
+  }
+
+  protected async onAvatarSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    const session = await firstValueFrom(this.supabase.session$);
+    if (!session?.user) return;
+
+    this.uploadingAvatar.set(true);
+    try {
+      const url = await this.attachmentService.uploadAvatar(session.user.id, file);
+      await this.profileService.updateProfile(session.user.id, {
+        full_name: this.profileForm.value.full_name ?? null,
+        username: this.profileForm.value.username ?? null,
+        website: this.profileForm.value.website ?? null,
+        avatar_url: url,
+      });
+      this.avatarUrl.set(url);
+      const toast = await this.toastCtrl.create({
+        message: 'Avatar updated',
+        duration: 2000,
+        color: 'success',
+      });
+      await toast.present();
+    } catch {
+      const toast = await this.toastCtrl.create({
+        message: 'Failed to upload avatar.',
+        duration: 3000,
+        color: 'danger',
+      });
+      await toast.present();
+    } finally {
+      this.uploadingAvatar.set(false);
+      input.value = '';
     }
   }
 }

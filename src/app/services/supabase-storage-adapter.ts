@@ -1,4 +1,5 @@
 import type { AttachmentRecord, RemoteStorageAdapter } from '@powersync/common';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import type { SupabaseService } from './supabase.service';
 
 interface AttachmentMetaData {
@@ -15,6 +16,11 @@ function parseMetaData(attachment: AttachmentRecord): AttachmentMetaData {
     throw new Error(`Attachment ${attachment.id} metaData must contain bucket and path`);
   }
   return parsed;
+}
+
+export function getPublicUrl(client: SupabaseClient, bucket: string, path: string): string {
+  const { data } = client.storage.from(bucket).getPublicUrl(path);
+  return data.publicUrl;
 }
 
 export class SupabaseStorageAdapter implements RemoteStorageAdapter {

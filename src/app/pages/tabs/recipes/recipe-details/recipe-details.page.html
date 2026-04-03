@@ -42,7 +42,13 @@
 
       <div class="flex items-center gap-3 mb-4">
         <ion-avatar>
-          <img [src]="author().avatar_url" />
+          @if (author().avatar_url) {
+            <img [src]="author().avatar_url" />
+          } @else {
+            <div class="flex items-center justify-center w-full h-full bg-[var(--ion-color-light)] text-[color:var(--ion-color-medium)]">
+              <ion-icon name="person"></ion-icon>
+            </div>
+          }
         </ion-avatar>
         <span>{{ author().full_name || author().username }}</span>
       </div>
