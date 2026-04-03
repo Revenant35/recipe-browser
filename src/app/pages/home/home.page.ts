@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, resource, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ViewWillEnter } from '@ionic/angular';
 import {
@@ -12,13 +12,13 @@ import {
   IonList,
   IonItem,
   IonLabel,
-  IonNote,
+  IonSearchbar,
+  IonSpinner,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { addOutline, logOutOutline } from 'ionicons/icons';
 import { SupabaseService } from '@app/services/supabase.service';
 import { RecipeService } from '@app/services/recipe.service';
-import { RecipeWithDetails } from '@app/models';
 
 @Component({
   selector: 'app-home',
@@ -36,34 +36,49 @@ import { RecipeWithDetails } from '@app/models';
     IonList,
     IonItem,
     IonLabel,
-    IonNote,
+    IonSearchbar,
+    IonSpinner,
   ],
 })
 export class HomePage implements ViewWillEnter {
-  private supabase = inject(SupabaseService);
-  private recipeService = inject(RecipeService);
-  private router = inject(Router);
+  private readonly supabase = inject(SupabaseService);
+  private readonly recipeService = inject(RecipeService);
+  private readonly router = inject(Router);
 
-  recipes = signal<RecipeWithDetails[]>([]);
+  protected searchQuery = signal('');
+
+  protected recipesResource = resource({
+    loader: () => this.recipeService.getRecipes(),
+  });
+
+  protected filteredRecipes = computed(() => {
+    const recipes = this.recipesResource.value() ?? [];
+    const query = this.searchQuery().toLowerCase().trim();
+    if (!query) return recipes;
+    return recipes.filter((r) => r.name.toLowerCase().includes(query));
+  });
 
   constructor() {
     addIcons({ addOutline, logOutOutline });
   }
 
-  async ionViewWillEnter() {
-    const recipes = await this.recipeService.getRecipes();
-    this.recipes.set(recipes);
+  public ionViewWillEnter() {
+    this.recipesResource.reload();
   }
 
-  async openRecipe(id: string) {
+  protected onSearch(event: CustomEvent) {
+    this.searchQuery.set(event.detail.value ?? '');
+  }
+
+  protected async openRecipe(id: string) {
     await this.router.navigateByUrl(`/recipes/${id}`);
   }
 
-  async createRecipe() {
+  protected async createRecipe() {
     await this.router.navigateByUrl('/recipes/create');
   }
 
-  async logout() {
+  protected async logout() {
     await this.supabase.signOut();
     await this.router.navigateByUrl('/auth/login');
   }

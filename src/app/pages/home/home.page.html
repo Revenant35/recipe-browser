@@ -19,16 +19,41 @@
     <ion-toolbar>
       <ion-title size="large">Recipes</ion-title>
     </ion-toolbar>
+    <ion-toolbar>
+      <ion-searchbar
+        placeholder="Search recipes"
+        [debounce]="200"
+        (ionInput)="onSearch($event)"
+      ></ion-searchbar>
+    </ion-toolbar>
   </ion-header>
 
-  <ion-list>
-    @for (recipe of recipes(); track recipe.id) {
-      <ion-item [button]="true" (click)="openRecipe(recipe.id)">
-        <ion-label>
-          {{ recipe.name }}
-        </ion-label>
-        <ion-note slot="end">{{ recipe.difficultyLevel?.name }}</ion-note>
-      </ion-item>
-    }
-  </ion-list>
+  @if (recipesResource.isLoading()) {
+    <div class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+  } @else if (recipesResource.error()) {
+    <div class="error-container ion-text-center ion-padding">
+      <p>Failed to load recipes.</p>
+      <ion-button fill="clear" (click)="recipesResource.reload()">Retry</ion-button>
+    </div>
+  } @else {
+    <ion-list>
+      @for (recipe of filteredRecipes(); track recipe.id) {
+        <ion-item [button]="true" (click)="openRecipe(recipe.id)">
+          <ion-label>{{ recipe.name }}</ion-label>
+        </ion-item>
+      } @empty {
+        <ion-item>
+          <ion-label class="ion-text-center">
+            @if (searchQuery()) {
+              No recipes match your search.
+            } @else {
+              No recipes yet. Tap + to create one!
+            }
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
 </ion-content>
