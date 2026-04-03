@@ -83,7 +83,7 @@
             <ion-icon slot="icon-only" name="clipboard-outline"></ion-icon>
           </ion-button>
         </div>
-        <ion-list [inset]="true" lines="full">
+        <ion-list lines="none">
           @for (ingredient of recipe().ingredients; track ingredient.id) {
             <ion-item (click)="toggleIngredient(ingredient.id)">
               <ion-checkbox
