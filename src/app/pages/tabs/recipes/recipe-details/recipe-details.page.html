@@ -54,26 +54,21 @@
     }
 
     @if (recipe().prep_time_minutes || recipe().cook_time_minutes) {
-      <div class="flex gap-6 mb-4 p-3 bg-[var(--ion-color-light)] rounded-lg">
+      <p class="flex items-center gap-2 text-sm text-[color:var(--ion-color-medium)] mb-4">
         @if (recipe().prep_time_minutes) {
-          <div class="flex flex-col items-center">
-            <span class="text-xs text-[color:var(--ion-color-medium)]">Prep</span>
-            <span class="font-semibold">{{ recipe().prep_time_minutes }} min</span>
-          </div>
+          <span>Prep {{ recipe().prep_time_minutes }} min</span>
+        }
+        @if (recipe().prep_time_minutes && recipe().cook_time_minutes) {
+          <span class="font-bold">&middot;</span>
         }
         @if (recipe().cook_time_minutes) {
-          <div class="flex flex-col items-center">
-            <span class="text-xs text-[color:var(--ion-color-medium)]">Cook</span>
-            <span class="font-semibold">{{ recipe().cook_time_minutes }} min</span>
-          </div>
+          <span>Cook {{ recipe().cook_time_minutes }} min</span>
         }
         @if (totalTime()) {
-          <div class="flex flex-col items-center">
-            <span class="text-xs text-(--ion-color-medium)">Total</span>
-            <span class="font-semibold">{{ totalTime() }} min</span>
-          </div>
+          <span class="font-bold">&middot;</span>
+          <span>Total {{ totalTime() }} min</span>
         }
-      </div>
+      </p>
     }
 
     @if (recipe().ingredients.length) {
