@@ -1,6 +1,6 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { relations } from 'drizzle-orm';
-import { DrizzleAppSchema } from '@powersync/drizzle-driver';
+import { DrizzleAppSchema, type DrizzleTableWithPowerSyncOptions } from '@powersync/drizzle-driver';
 
 export const profiles = sqliteTable('profiles', {
   id: text('id').primaryKey().notNull(),
@@ -71,6 +71,18 @@ export const recipeNotes = sqliteTable('recipe_notes', {
   user_id: text('user_id').notNull(),
   recipe_id: text('recipe_id').notNull(),
   value: text('value').notNull(),
+});
+
+export const attachments = sqliteTable('attachments', {
+  id: text('id').primaryKey().notNull(),
+  filename: text('filename').notNull(),
+  local_uri: text('local_uri'),
+  timestamp: integer('timestamp'),
+  size: integer('size'),
+  media_type: text('media_type'),
+  state: integer('state').notNull(),
+  has_synced: integer('has_synced'),
+  meta_data: text('meta_data'),
 });
 
 // Relations
@@ -149,4 +161,14 @@ export const drizzleSchema = {
   recipeNotesRelations,
 };
 
-export const AppSchema = new DrizzleAppSchema(drizzleSchema);
+const attachmentsWithOptions: DrizzleTableWithPowerSyncOptions = {
+  tableDefinition: attachments,
+  options: { localOnly: true },
+};
+
+export const powerSyncSchema = {
+  ...drizzleSchema,
+  attachments: attachmentsWithOptions,
+};
+
+export const AppSchema = new DrizzleAppSchema(powerSyncSchema);
