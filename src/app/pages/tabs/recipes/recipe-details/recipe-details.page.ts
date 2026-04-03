@@ -21,7 +21,7 @@ import {
 } from '@ionic/angular/standalone';
 import { ActionSheetController, AlertController, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { createOutline, ellipsisHorizontal, trashOutline } from 'ionicons/icons';
+import { clipboardOutline, createOutline, ellipsisHorizontal, trashOutline } from 'ionicons/icons';
 import { RecipeWithDetails, Profile } from '@app/models';
 import { RecipeService } from '@app/services/recipe.service';
 import { SupabaseService } from '@app/services/supabase.service';
@@ -70,12 +70,24 @@ export class RecipeDetailsPage implements OnInit {
   });
 
   constructor() {
-    addIcons({ createOutline, ellipsisHorizontal, trashOutline });
+    addIcons({ clipboardOutline, createOutline, ellipsisHorizontal, trashOutline });
   }
 
   async ngOnInit() {
     const session = await firstValueFrom(this.supabase.session$);
     this.isOwner.set(session?.user?.id === this.recipe().user_id);
+  }
+
+  protected async copyIngredients() {
+    const text = this.recipe()
+      .ingredients.map((i) => i.value)
+      .join('\n');
+    await navigator.clipboard.writeText(text);
+    const toast = await this.toastCtrl.create({
+      message: 'Ingredients copied to clipboard',
+      duration: 2000,
+    });
+    await toast.present();
   }
 
   protected toggleIngredient(id: string) {

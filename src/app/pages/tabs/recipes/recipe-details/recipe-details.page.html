@@ -110,7 +110,12 @@
 
     @if (recipe().ingredients.length) {
       <div>
-        <h3 class="mt-4 mb-2">Ingredients</h3>
+        <div class="flex items-center justify-between mt-4 mb-2">
+          <h3>Ingredients</h3>
+          <ion-button fill="clear" size="small" (click)="copyIngredients()">
+            <ion-icon slot="icon-only" name="clipboard-outline"></ion-icon>
+          </ion-button>
+        </div>
         <ion-list [inset]="true" lines="full">
           @for (ingredient of recipe().ingredients; track ingredient.id) {
             <ion-item (click)="toggleIngredient(ingredient.id)">
