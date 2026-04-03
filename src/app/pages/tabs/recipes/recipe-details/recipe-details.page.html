@@ -134,14 +134,14 @@
     @if (recipe().instructions.length) {
       <div>
         <h3 class="mt-4 mb-2">Instructions</h3>
-        <ion-list>
+        <div class="flex flex-col gap-3">
           @for (instruction of recipe().instructions; track instruction.id; let i = $index) {
-            <ion-item>
-              <ion-note slot="start">{{ i + 1 }}</ion-note>
-              <ion-label class="ion-text-wrap">{{ instruction.value }}</ion-label>
-            </ion-item>
+            <div class="p-3 bg-[var(--ion-color-light)] rounded-lg">
+              <p class="text-xs font-semibold text-[color:var(--ion-color-medium)] mb-1">Step {{ i + 1 }}</p>
+              <p>{{ instruction.value }}</p>
+            </div>
           }
-        </ion-list>
+        </div>
       </div>
     }
 
