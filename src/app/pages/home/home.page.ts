@@ -16,8 +16,7 @@ import {
   IonSpinner,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { addOutline, logOutOutline } from 'ionicons/icons';
-import { SupabaseService } from '@app/services/supabase.service';
+import { addOutline } from 'ionicons/icons';
 import { RecipeService } from '@app/services/recipe.service';
 
 @Component({
@@ -41,7 +40,6 @@ import { RecipeService } from '@app/services/recipe.service';
   ],
 })
 export class HomePage implements ViewWillEnter {
-  private readonly supabase = inject(SupabaseService);
   private readonly recipeService = inject(RecipeService);
   private readonly router = inject(Router);
 
@@ -59,7 +57,7 @@ export class HomePage implements ViewWillEnter {
   });
 
   constructor() {
-    addIcons({ addOutline, logOutOutline });
+    addIcons({ addOutline });
   }
 
   public ionViewWillEnter() {
@@ -76,10 +74,5 @@ export class HomePage implements ViewWillEnter {
 
   protected async createRecipe() {
     await this.router.navigateByUrl('/recipes/create');
-  }
-
-  protected async logout() {
-    await this.supabase.signOut();
-    await this.router.navigateByUrl('/auth/login');
   }
 }

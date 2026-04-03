@@ -5,9 +5,10 @@ import { authorResolver } from './resolvers/author.resolver';
 
 export const routes: Routes = [
   {
-    path: 'home',
-    loadComponent: () => import('./pages/home/home.page').then((m) => m.HomePage),
+    path: '',
+    loadComponent: () => import('./pages/tabs/tabs.page').then((m) => m.TabsPage),
     canActivate: [authGuard],
+    loadChildren: () => import('./pages/tabs/tabs.routes').then((m) => m.tabsRoutes),
   },
   {
     path: 'recipes/create',
@@ -29,10 +30,5 @@ export const routes: Routes = [
   {
     path: 'auth',
     loadChildren: () => import('./auth/auth.routes').then((m) => m.authRoutes),
-  },
-  {
-    path: '',
-    redirectTo: 'home',
-    pathMatch: 'full',
   },
 ];
