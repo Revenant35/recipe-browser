@@ -6,8 +6,9 @@ import {
   UpdateType,
 } from '@powersync/common';
 import { firstValueFrom } from 'rxjs';
-import { SupabaseService } from './supabase.service';
+import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
+import { SUPABASE_CLIENT } from '@app/supabase/supabase-client.token';
 
 const FATAL_RESPONSE_CODES = [
   /^22...$/, // data exception
@@ -17,10 +18,11 @@ const FATAL_RESPONSE_CODES = [
 
 @Injectable({ providedIn: 'root' })
 export class SupabaseConnector implements PowerSyncBackendConnector {
-  private readonly supabaseService = inject(SupabaseService);
+  private readonly auth = inject(AuthService);
+  private readonly supabase = inject(SUPABASE_CLIENT);
 
   async fetchCredentials() {
-    const session = await firstValueFrom(this.supabaseService.session$);
+    const session = await firstValueFrom(this.auth.session$);
 
     if (!session) {
       throw new Error('Could not fetch Supabase credentials: No session');
@@ -48,7 +50,7 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
       for (let i = 0; i < transaction.crud.length; i++) {
         const cruds = transaction.crud;
         const op = cruds[i];
-        const table = this.supabaseService.client.from(op.table);
+        const table = this.supabase.from(op.table);
         batchedOps.push(op);
 
         let result: any;

@@ -23,7 +23,7 @@ import { addIcons } from 'ionicons';
 import { clipboardOutline, createOutline, ellipsisHorizontal, trashOutline } from 'ionicons/icons';
 import { RecipeWithDetails, Profile } from '@app/models';
 import { RecipeService } from '@app/services/recipe.service';
-import { SupabaseService } from '@app/services/supabase.service';
+import { AuthService } from '@app/services/auth.service';
 
 @Component({
   selector: 'app-recipe-details',
@@ -47,7 +47,7 @@ import { SupabaseService } from '@app/services/supabase.service';
   ],
 })
 export class RecipeDetailsPage implements OnInit {
-  private supabase = inject(SupabaseService);
+  private auth = inject(AuthService);
   private recipeService = inject(RecipeService);
   private actionSheetCtrl = inject(ActionSheetController);
   private alertCtrl = inject(AlertController);
@@ -72,7 +72,7 @@ export class RecipeDetailsPage implements OnInit {
   }
 
   async ngOnInit() {
-    const session = await firstValueFrom(this.supabase.session$);
+    const session = await firstValueFrom(this.auth.session$);
     this.isOwner.set(session?.user?.id === this.recipe().user_id);
   }
 

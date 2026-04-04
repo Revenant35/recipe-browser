@@ -5,7 +5,7 @@ import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { personAddOutline } from 'ionicons/icons';
-import { SupabaseService } from '@app/services/supabase.service';
+import { AuthService } from '@app/services/auth.service';
 
 @Component({
   selector: 'app-signup',
@@ -15,7 +15,7 @@ import { SupabaseService } from '@app/services/supabase.service';
   styleUrl: './signup.page.scss',
 })
 export class SignupPage {
-  private supabase = inject(SupabaseService);
+  private auth = inject(AuthService);
   private toastCtrl = inject(ToastController);
   private router = inject(Router);
 
@@ -34,7 +34,7 @@ export class SignupPage {
 
     const { email, password } = this.signupForm.value;
     this.loading.set(true);
-    const { error } = await this.supabase.signUp(email!.trim(), password!);
+    const { error } = await this.auth.signUp(email!.trim(), password!);
     this.loading.set(false);
 
     if (error) {

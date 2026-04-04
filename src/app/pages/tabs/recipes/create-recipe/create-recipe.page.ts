@@ -10,7 +10,7 @@ import {
 } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
-import { SupabaseService } from '@app/services/supabase.service';
+import { AuthService } from '@app/services/auth.service';
 import { RecipeService } from '@app/services/recipe.service';
 import { RecipeFormComponent, RecipeFormValue } from '@app/forms/recipe-form/recipe-form.component';
 
@@ -29,7 +29,7 @@ import { RecipeFormComponent, RecipeFormValue } from '@app/forms/recipe-form/rec
   templateUrl: './create-recipe.page.html',
 })
 export class CreateRecipePage {
-  private supabase = inject(SupabaseService);
+  private auth = inject(AuthService);
   private recipeService = inject(RecipeService);
   private toastCtrl = inject(ToastController);
   private router = inject(Router);
@@ -38,7 +38,7 @@ export class CreateRecipePage {
 
   protected async submit(value: RecipeFormValue) {
     try {
-      const session = await firstValueFrom(this.supabase.session$);
+      const session = await firstValueFrom(this.auth.session$);
       if (!session?.user) {
         throw new Error('You must be logged in to create a recipe.');
       }

@@ -13,7 +13,7 @@ import {
 import { RouterLink } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { logOutOutline, personOutline } from 'ionicons/icons';
-import { SupabaseService } from '@app/services/supabase.service';
+import { AuthService } from '@app/services/auth.service';
 
 @Component({
   selector: 'app-settings',
@@ -32,7 +32,7 @@ import { SupabaseService } from '@app/services/supabase.service';
   ],
 })
 export class SettingsPage {
-  private readonly supabase = inject(SupabaseService);
+  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
   constructor() {
@@ -40,7 +40,7 @@ export class SettingsPage {
   }
 
   protected async logout() {
-    await this.supabase.signOut();
+    await this.auth.signOut();
     await this.router.navigateByUrl('/auth/login');
   }
 }

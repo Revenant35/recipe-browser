@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { addIcons } from 'ionicons';
 import { lockClosedOutline } from 'ionicons/icons';
-import { SupabaseService } from '@app/services/supabase.service';
+import { AuthService } from '@app/services/auth.service';
 
 @Component({
   selector: 'app-reset-password',
@@ -15,7 +15,7 @@ import { SupabaseService } from '@app/services/supabase.service';
   styleUrl: './reset-password.page.scss',
 })
 export class ResetPasswordPage {
-  private supabase = inject(SupabaseService);
+  private auth = inject(AuthService);
   private toastCtrl = inject(ToastController);
   private router = inject(Router);
 
@@ -38,7 +38,7 @@ export class ResetPasswordPage {
 
     const { password } = this.passwordForm.value;
     this.loading.set(true);
-    const { error } = await this.supabase.updatePassword(password!);
+    const { error } = await this.auth.updatePassword(password!);
     this.loading.set(false);
 
     if (error) {

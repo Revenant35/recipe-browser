@@ -17,7 +17,7 @@ import {
   IonIcon,
 } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
-import { SupabaseService } from '@app/services/supabase.service';
+import { AuthService } from '@app/services/auth.service';
 import { ProfileService } from '@app/services/profile.service';
 import { AttachmentService } from '@app/services/attachment.service';
 
@@ -43,7 +43,7 @@ import { AttachmentService } from '@app/services/attachment.service';
   ],
 })
 export class AccountPage implements OnInit {
-  private supabase = inject(SupabaseService);
+  private auth = inject(AuthService);
   private profileService = inject(ProfileService);
   private attachmentService = inject(AttachmentService);
   private toastCtrl = inject(ToastController);
@@ -60,7 +60,7 @@ export class AccountPage implements OnInit {
   });
 
   async ngOnInit() {
-    const session = await firstValueFrom(this.supabase.session$);
+    const session = await firstValueFrom(this.auth.session$);
     if (!session?.user) return;
 
     const profile = await this.profileService.getProfile(session.user.id);
@@ -76,7 +76,7 @@ export class AccountPage implements OnInit {
   }
 
   protected async save() {
-    const session = await firstValueFrom(this.supabase.session$);
+    const session = await firstValueFrom(this.auth.session$);
     if (!session?.user) return;
 
     this.saving.set(true);
@@ -110,7 +110,7 @@ export class AccountPage implements OnInit {
     const file = input.files?.[0];
     if (!file) return;
 
-    const session = await firstValueFrom(this.supabase.session$);
+    const session = await firstValueFrom(this.auth.session$);
     if (!session?.user) return;
 
     this.uploadingAvatar.set(true);

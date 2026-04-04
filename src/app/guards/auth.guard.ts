@@ -1,19 +1,19 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { SupabaseService } from '../services/supabase.service';
+import { AuthService } from '@app/services/auth.service';
 import { map, take } from 'rxjs/operators';
 
 export const authGuard: CanActivateFn = () => {
-  const supabase = inject(SupabaseService);
+  const auth = inject(AuthService);
   const router = inject(Router);
 
-  return supabase.session$.pipe(
+  return auth.session$.pipe(
     take(1),
-    map(session => {
+    map((session) => {
       if (session) {
         return true;
       }
       return router.createUrlTree(['/auth/login']);
-    })
+    }),
   );
 };

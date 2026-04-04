@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { AttachmentQueue, type AttachmentRecord } from '@powersync/common';
 import { PowerSyncService } from './powersync.service';
-import { SupabaseService } from './supabase.service';
 import { SupabaseStorageAdapter, getPublicUrl } from './supabase-storage-adapter';
 import { CapacitorStorageAdapter } from './capacitor-storage-adapter';
+import { SUPABASE_CLIENT } from '@app/supabase/supabase-client.token';
 
 export interface SaveFileOptions {
   data: ArrayBuffer | string;
@@ -16,10 +16,10 @@ export interface SaveFileOptions {
 @Injectable({ providedIn: 'root' })
 export class AttachmentService {
   private readonly powerSyncService = inject(PowerSyncService);
-  private readonly supabaseService = inject(SupabaseService);
+  private readonly supabase = inject(SUPABASE_CLIENT);
 
   private readonly localStorage = new CapacitorStorageAdapter();
-  private readonly remoteStorage = new SupabaseStorageAdapter(this.supabaseService);
+  private readonly remoteStorage = new SupabaseStorageAdapter(this.supabase);
 
   private readonly queue = new AttachmentQueue({
     db: this.powerSyncService.db,
@@ -50,14 +50,17 @@ export class AttachmentService {
       ? file.name.split('.').pop()!
       : file.type.split('/')[1] || 'jpg';
     const path = `${userId}.${ext}`;
-    const { error } = await this.supabaseService.client.storage
+    const { error } = await this.supabase.storage
       .from('avatars')
       .upload(path, file, { upsert: true, contentType: file.type });
     if (error) throw error;
-    return getPublicUrl(this.supabaseService.client, 'avatars', path);
+    return getPublicUrl(this.supabase, 'avatars', path);
   }
 
-  async deleteFile(id: string, updateHook?: (transaction: any, attachment: AttachmentRecord) => Promise<void>): Promise<void> {
+  async deleteFile(
+    id: string,
+    updateHook?: (transaction: any, attachment: AttachmentRecord) => Promise<void>,
+  ): Promise<void> {
     await this.queue.deleteFile({ id, updateHook });
   }
 

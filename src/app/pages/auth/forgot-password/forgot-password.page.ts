@@ -5,7 +5,7 @@ import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angula
 import { RouterLink } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { mailOutline } from 'ionicons/icons';
-import { SupabaseService } from '@app/services/supabase.service';
+import { AuthService } from '@app/services/auth.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -15,7 +15,7 @@ import { SupabaseService } from '@app/services/supabase.service';
   styleUrl: './forgot-password.page.scss',
 })
 export class ForgotPasswordPage {
-  private supabase = inject(SupabaseService);
+  private auth = inject(AuthService);
   private toastCtrl = inject(ToastController);
 
   protected emailForm = new FormGroup({
@@ -33,7 +33,7 @@ export class ForgotPasswordPage {
 
     const { email } = this.emailForm.value;
     this.loading.set(true);
-    const { error } = await this.supabase.resetPasswordForEmail(email!.trim());
+    const { error } = await this.auth.resetPasswordForEmail(email!.trim());
     this.loading.set(false);
 
     if (error) {

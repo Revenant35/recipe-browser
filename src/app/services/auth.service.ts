@@ -1,24 +1,16 @@
-import { Injectable } from '@angular/core';
-import { createClient, SupabaseClient, Session } from '@supabase/supabase-js';
+import { inject, Injectable } from '@angular/core';
+import { Session } from '@supabase/supabase-js';
 import { ReplaySubject } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { SUPABASE_CLIENT } from '@app/supabase/supabase-client.token';
 
 @Injectable({ providedIn: 'root' })
-export class SupabaseService {
-  private readonly supabase: SupabaseClient;
-  private readonly _session$ = new ReplaySubject<Session | null>(1);
+export class AuthService {
+  private readonly supabase = inject(SUPABASE_CLIENT);
 
+  private readonly _session$ = new ReplaySubject<Session | null>(1);
   public readonly session$ = this._session$.asObservable();
 
   constructor() {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey, {
-      auth: {
-        lock: async (_name: string, _acquireTimeout: number, fn: () => Promise<any>) => {
-          return await fn();
-        },
-      },
-    });
-
     this.supabase.auth.getSession().then(({ data: { session } }) => {
       this._session$.next(session);
     });
@@ -26,10 +18,6 @@ export class SupabaseService {
     this.supabase.auth.onAuthStateChange((_event, session) => {
       this._session$.next(session);
     });
-  }
-
-  public get client(): SupabaseClient {
-    return this.supabase;
   }
 
   public signUp(email: string, password: string) {
