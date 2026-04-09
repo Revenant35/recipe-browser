@@ -1,16 +1,23 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/recipes"></ion-back-button>
+      <ion-back-button defaultHref="/saved"></ion-back-button>
     </ion-buttons>
     <ion-title>{{ recipe().name }}</ion-title>
-    @if (isOwner()) {
-      <ion-buttons slot="end">
+    <ion-buttons slot="end">
+      <ion-button (click)="toggleSave()">
+        <ion-icon
+          slot="icon-only"
+          [name]="isSaved() ? 'bookmark' : 'bookmark-outline'"
+          [color]="isSaved() ? 'primary' : 'medium'"
+        ></ion-icon>
+      </ion-button>
+      @if (isOwner()) {
         <ion-button (click)="openActions()">
           <ion-icon slot="icon-only" name="ellipsis-horizontal"></ion-icon>
         </ion-button>
-      </ion-buttons>
-    }
+      }
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 

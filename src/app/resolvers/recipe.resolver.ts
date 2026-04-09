@@ -12,10 +12,12 @@ export const recipeResolver: ResolveFn<RecipeWithDetails> = async (route) => {
     throw new Error('Missing required route parameter: id');
   }
 
-  const recipe = await recipeService.getRecipe(id);
+  // Try local PowerSync DB first (recipe is saved/owned), fall back to Supabase
+  const recipe =
+    (await recipeService.getRecipe(id)) ?? (await recipeService.getRecipeFromSupabase(id));
 
   if (!recipe) {
-    throw new Error(`Recipe not found: ${route.paramMap.get('id')}`);
+    throw new Error(`Recipe not found: ${id}`);
   }
 
   return recipe;

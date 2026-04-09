@@ -48,6 +48,9 @@ export class CreateRecipePage {
         user_id: session.user.id,
       });
 
+      // Auto-save the user's own recipe to their saved list
+      await this.recipeService.saveRecipe(session.user.id, recipeId);
+
       const toast = await this.toastCtrl.create({
         message: 'Recipe created!',
         duration: 2000,

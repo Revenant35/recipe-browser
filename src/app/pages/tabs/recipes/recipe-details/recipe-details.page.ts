@@ -20,7 +20,7 @@ import {
 } from '@ionic/angular/standalone';
 import { ActionSheetController, AlertController, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { clipboardOutline, createOutline, ellipsisHorizontal, trashOutline } from 'ionicons/icons';
+import { bookmark, bookmarkOutline, clipboardOutline, createOutline, ellipsisHorizontal, trashOutline } from 'ionicons/icons';
 import { RecipeWithDetails, Profile } from '@app/models';
 import { RecipeService } from '@app/services/recipe.service';
 import { AuthService } from '@app/services/auth.service';
@@ -58,6 +58,7 @@ export class RecipeDetailsPage implements OnInit {
   author = input.required<Profile>();
 
   protected isOwner = signal(false);
+  protected isSaved = signal(false);
   protected checkedIngredients = signal(new Set<string>());
 
   totalTime = computed(() => {
@@ -72,8 +73,25 @@ export class RecipeDetailsPage implements OnInit {
   }
 
   async ngOnInit() {
-    const session = await firstValueFrom(this.auth.session$);
+    const [session, saved] = await Promise.all([
+      firstValueFrom(this.auth.session$),
+      this.recipeService.isRecipeSaved(this.recipe().id),
+    ]);
     this.isOwner.set(session?.user?.id === this.recipe().user_id);
+    this.isSaved.set(saved);
+  }
+
+  async toggleSave() {
+    const session = await firstValueFrom(this.auth.session$);
+    if (!session?.user) return;
+
+    if (this.isSaved()) {
+      await this.recipeService.unsaveRecipe(this.recipe().id);
+      this.isSaved.set(false);
+    } else {
+      await this.recipeService.saveRecipe(session.user.id, this.recipe().id);
+      this.isSaved.set(true);
+    }
   }
 
   protected async copyIngredients() {
@@ -137,7 +155,7 @@ export class RecipeDetailsPage implements OnInit {
           handler: async () => {
             try {
               await this.recipeService.deleteRecipe(this.recipe().id);
-              this.router.navigate(['/recipes']);
+              this.router.navigate(['/saved']);
             } catch {
               const toast = await this.toastCtrl.create({
                 message: 'Failed to delete recipe.',

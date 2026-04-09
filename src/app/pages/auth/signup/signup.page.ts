@@ -47,6 +47,6 @@ export class SignupPage {
       return;
     }
 
-    await this.router.navigateByUrl('/recipes');
+    await this.router.navigateByUrl('/saved');
   }
 }

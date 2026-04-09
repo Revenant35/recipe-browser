@@ -9,5 +9,50 @@
     <ion-toolbar>
       <ion-title size="large">Explore</ion-title>
     </ion-toolbar>
+    <ion-toolbar>
+      <ion-searchbar
+        placeholder="Search all recipes"
+        [debounce]="400"
+        (ionInput)="onSearch($event)"
+      ></ion-searchbar>
+    </ion-toolbar>
   </ion-header>
+
+  @if (isLoading()) {
+    <div class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+  } @else {
+    <ion-list>
+      @for (recipe of recipes(); track recipe.id) {
+        <ion-item [button]="true" (click)="openRecipe(recipe.id)">
+          <ion-label>
+            <h2>{{ recipe.name }}</h2>
+            <p>{{ recipe.profiles?.full_name || recipe.profiles?.username || 'Unknown' }}</p>
+          </ion-label>
+          <ion-button fill="clear" slot="end" (click)="toggleSave($event, recipe.id)">
+            <ion-icon
+              slot="icon-only"
+              [name]="isSaved(recipe.id) ? 'bookmark' : 'bookmark-outline'"
+              [color]="isSaved(recipe.id) ? 'primary' : 'medium'"
+            ></ion-icon>
+          </ion-button>
+        </ion-item>
+      } @empty {
+        <ion-item>
+          <ion-label class="ion-text-center">
+            @if (searchQuery()) {
+              No recipes match your search.
+            } @else {
+              No recipes available yet.
+            }
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+
+    <ion-infinite-scroll (ionInfinite)="loadMore($any($event))">
+      <ion-infinite-scroll-content loadingSpinner="crescent"></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  }
 </ion-content>

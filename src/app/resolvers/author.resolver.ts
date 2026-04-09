@@ -14,13 +14,17 @@ export const authorResolver: ResolveFn<Profile> = async (route) => {
     throw new Error('Missing required route parameter: id');
   }
 
-  const recipe = await recipeService.getRecipe(id);
+  // Try local PowerSync DB first, fall back to Supabase
+  const recipe =
+    (await recipeService.getRecipe(id)) ?? (await recipeService.getRecipeFromSupabase(id));
 
   if (!recipe) {
     throw new Error(`Recipe not found: ${id}`);
   }
 
-  const profile = await profileService.getProfile(recipe.user_id);
+  const profile =
+    (await profileService.getProfile(recipe.user_id)) ??
+    (await profileService.getProfileFromSupabase(recipe.user_id));
 
   if (!profile) {
     throw new Error(`Profile not found for user: ${recipe.user_id}`);

@@ -1,0 +1,58 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Saved
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Saved</ion-title>
+    </ion-toolbar>
+    <ion-toolbar>
+      <ion-searchbar
+        placeholder="Search saved recipes"
+        [debounce]="200"
+        (ionInput)="onSearch($event)"
+      ></ion-searchbar>
+    </ion-toolbar>
+  </ion-header>
+
+  @if (recipesResource.isLoading()) {
+    <div class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+  } @else if (recipesResource.error()) {
+    <div class="error-container ion-text-center ion-padding">
+      <p>Failed to load recipes.</p>
+      <ion-button fill="clear" (click)="recipesResource.reload()">Retry</ion-button>
+    </div>
+  } @else {
+    <ion-list>
+      @for (recipe of filteredRecipes(); track recipe.id) {
+        <ion-item [button]="true" (click)="openRecipe(recipe.id)">
+          <ion-icon name="bookmark" slot="start" color="primary"></ion-icon>
+          <ion-label>{{ recipe.name }}</ion-label>
+        </ion-item>
+      } @empty {
+        <ion-item>
+          <ion-label class="ion-text-center">
+            @if (searchQuery()) {
+              No saved recipes match your search.
+            } @else {
+              No saved recipes yet. Explore recipes and save your favorites!
+            }
+          </ion-label>
+        </ion-item>
+      }
+    </ion-list>
+  }
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="createRecipe()">
+      <ion-icon name="add-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

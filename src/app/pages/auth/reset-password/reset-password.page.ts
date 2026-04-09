@@ -56,6 +56,6 @@ export class ResetPasswordPage {
       duration: 3000,
     });
     await toast.present();
-    await this.router.navigate(['/recipes']);
+    await this.router.navigate(['/saved']);
   }
 }

@@ -73,6 +73,13 @@ export const recipeNotes = sqliteTable('recipe_notes', {
   value: text('value').notNull(),
 });
 
+export const savedRecipes = sqliteTable('saved_recipes', {
+  id: text('id').primaryKey().notNull(),
+  created_at: text('created_at'),
+  user_id: text('user_id').notNull(),
+  recipe_id: text('recipe_id').notNull(),
+});
+
 export const attachments = sqliteTable('attachments', {
   id: text('id').primaryKey().notNull(),
   filename: text('filename').notNull(),
@@ -117,6 +124,7 @@ export const recipesRelations = relations(recipes, ({ one, many }) => ({
   ingredients: many(recipeIngredients),
   instructions: many(recipeInstructions),
   notes: many(recipeNotes),
+  savedRecipes: many(savedRecipes),
 }));
 
 export const recipeIngredientsRelations = relations(recipeIngredients, ({ one }) => ({
@@ -140,6 +148,13 @@ export const recipeNotesRelations = relations(recipeNotes, ({ one }) => ({
   }),
 }));
 
+export const savedRecipesRelations = relations(savedRecipes, ({ one }) => ({
+  recipe: one(recipes, {
+    fields: [savedRecipes.recipe_id],
+    references: [recipes.id],
+  }),
+}));
+
 // DrizzleAppSchema
 
 export const drizzleSchema = {
@@ -159,6 +174,8 @@ export const drizzleSchema = {
   recipeInstructionsRelations,
   recipeNotes,
   recipeNotesRelations,
+  savedRecipes,
+  savedRecipesRelations,
 };
 
 const attachmentsWithOptions: DrizzleTableWithPowerSyncOptions = {
