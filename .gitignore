@@ -65,6 +65,12 @@ yarn-error.log
 testem.log
 /typings
 
+# Supabase
+.supabase
+
 # System files
 .DS_Store
 Thumbs.db
+
+# Claude
+.claude

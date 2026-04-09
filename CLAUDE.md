@@ -75,3 +75,21 @@ All defined in `src/app/db/schema.ts` using Drizzle ORM with relations.
 - PowerSync must be initialized in `AppComponent` before any data access
 - Recipe mutations (create/update/delete) go through `RecipeService`
 - All components must be standalone (no NgModule)
+
+## Intent Layer
+
+**Before modifying code in a subdirectory, read the relevant source files first** to understand local patterns and invariants.
+
+### Navigation
+
+- **Data layer**: `src/app/db/schema.ts` — Drizzle schema is the single source of truth for all table definitions and relations
+- **Sync engine**: `src/app/services/powersync.service.ts` — PowerSync initialization, connector wiring, and local SQLite access
+- **Auth boundary**: `src/app/services/supabase.service.ts` — All Supabase auth calls; nothing else should touch Supabase directly
+- **Recipe mutations**: `src/app/services/recipe.service.ts` — All create/update/delete operations for recipes and related entities
+- **Supabase IaC**: `supabase/` — Migrations, config, and edge functions; changes here affect the remote database. See [`supabase/CLAUDE.md`](supabase/CLAUDE.md) for workflow and invariants.
+
+### Critical Contracts
+
+- **Offline-first data flow**: PowerSync (local SQLite) → Drizzle ORM → UI. Supabase is only the sync target, never queried directly for reads.
+- **Auth is isolated**: `SupabaseService` owns the session lifecycle. Guards and resolvers consume session state but never call Supabase auth APIs.
+- **Schema alignment**: `src/app/db/schema.ts` (Drizzle) and `supabase/migrations/` must stay in sync — a new column requires both a migration and a schema update.
