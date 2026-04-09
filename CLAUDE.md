@@ -87,6 +87,7 @@ All defined in `src/app/db/schema.ts` using Drizzle ORM with relations.
 - **Auth boundary**: `src/app/services/supabase.service.ts` — All Supabase auth calls; nothing else should touch Supabase directly
 - **Recipe mutations**: `src/app/services/recipe.service.ts` — All create/update/delete operations for recipes and related entities
 - **Supabase IaC**: `supabase/` — Migrations, config, and edge functions; changes here affect the remote database. See [`supabase/CLAUDE.md`](supabase/CLAUDE.md) for workflow and invariants.
+- **PowerSync IaC**: `powersync/` — Sync streams, instance config, and CLI link. Changes here affect which data syncs to clients. See [`powersync/CLAUDE.md`](powersync/CLAUDE.md) for workflow and invariants.
 
 ### Critical Contracts
 

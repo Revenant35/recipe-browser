@@ -1,0 +1,26 @@
+# Adds YAML Schema support for VSCode users with the YAML extension installed. This enables features like validation and autocompletion based on the provided schema.
+# yaml-language-server: $schema=https://unpkg.com/@powersync/service-sync-rules@latest/schema/sync_rules.json
+# See https://docs.powersync.com/sync/advanced/compatibility
+config:
+  edition: 3
+
+# Define Sync Streams to control which data is synced to each user
+# Docs: https://docs.powersync.com/sync/streams/overview
+streams:
+  global:
+    auto_subscribe: true
+    queries:
+      - SELECT * FROM recipe_difficulties
+      - SELECT * FROM profiles
+
+  by_user:
+    auto_subscribe: true
+    with:
+      user_recipe_ids: SELECT id FROM recipes WHERE user_id = auth.user_id()
+    queries:
+      - SELECT * FROM recipes WHERE user_id = auth.user_id()
+      - SELECT * FROM tags WHERE user_id = auth.user_id()
+      - SELECT * FROM recipe_notes WHERE recipe_id IN user_recipe_ids
+      - SELECT * FROM recipe_ingredients WHERE recipe_id IN user_recipe_ids
+      - SELECT * FROM recipe_instructions WHERE recipe_id IN user_recipe_ids
+      - SELECT * FROM recipe_tags WHERE recipe_id IN user_recipe_ids
