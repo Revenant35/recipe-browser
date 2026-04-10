@@ -4,7 +4,7 @@ import { filter } from 'rxjs/operators';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { AuthService } from './services/auth.service';
 import { PowerSyncService } from './services/powersync.service';
-import { AttachmentService } from './services/attachment.service';
+import { AttachmentQueueManager } from './services/attachment-queue.manager';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +16,7 @@ import { AttachmentService } from './services/attachment.service';
 export class AppComponent implements OnInit, OnDestroy {
   private readonly auth = inject(AuthService);
   private readonly powerSyncService = inject(PowerSyncService);
-  private readonly attachmentService = inject(AttachmentService);
+  private readonly attachmentQueueManager = inject(AttachmentQueueManager);
 
   private sessionSub!: Subscription;
 
@@ -25,13 +25,13 @@ export class AppComponent implements OnInit, OnDestroy {
       .pipe(filter((session) => session !== null))
       .subscribe(async () => {
         await this.powerSyncService.init();
-        await this.attachmentService.init();
+        await this.attachmentQueueManager.init();
       });
   }
 
   ngOnDestroy(): void {
     this.sessionSub?.unsubscribe();
-    this.attachmentService.stopSync();
+    this.attachmentQueueManager.stop();
     this.powerSyncService.disconnect();
   }
 }

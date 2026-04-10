@@ -3,21 +3,31 @@ import { inject, Injectable } from '@angular/core';
 import { Directory, FilesystemPlugin } from '@capacitor/filesystem';
 import { FILESYSTEM } from './tokens/filesystem.token';
 
-// TODO: Document
+/** Factory for creating {@link LocalStorageAdapter} instances backed by the Capacitor Filesystem API. */
 @Injectable()
-export class CapacitorStorageAdapterFactory {
+export class LocalStorageAdapterFactory {
   private readonly filesystem = inject(FILESYSTEM);
 
-  // Note: Don't create multiple instances of the same location.
+  /**
+   * Creates a new {@link LocalStorageAdapter} scoped to the given path and directory.
+   *
+   * @param path - The base directory path for storing files.
+   * @param directory - The Capacitor {@link Directory} to use. Defaults to {@link Directory.LibraryNoCloud}.
+   *
+   * @remarks Do not create multiple instances targeting the same path.
+   */
   public create(
     path: string,
     directory: Directory = Directory.LibraryNoCloud,
-  ): CapacitorStorageAdapter {
+  ): LocalStorageAdapter {
     return new CapacitorStorageAdapter(this.filesystem, directory, path);
   }
 }
 
-// TODO: Document
+/**
+ * {@link LocalStorageAdapter} implementation that delegates to the Capacitor Filesystem plugin,
+ * storing all files under a configured {@link Directory} and base path.
+ */
 class CapacitorStorageAdapter implements LocalStorageAdapter {
   constructor(
     private readonly filesystem: FilesystemPlugin,
@@ -38,10 +48,9 @@ class CapacitorStorageAdapter implements LocalStorageAdapter {
     return `${this.path}/${filename}`;
   }
 
-  // TODO: Overhaul
   async saveFile(filePath: string, data: ArrayBuffer | string): Promise<number> {
     try {
-      const base64 = typeof data === 'string' ? data : this.arrayBufferToBase64(data);
+      const base64 = await this.toBase64(data);
 
       await this.filesystem.writeFile({
         path: filePath,
@@ -83,7 +92,6 @@ class CapacitorStorageAdapter implements LocalStorageAdapter {
     }
   }
 
-  // TODO: Overhaul
   async readFile(filePath: string): Promise<ArrayBuffer> {
     try {
       const result = await this.filesystem.readFile({
@@ -95,7 +103,7 @@ class CapacitorStorageAdapter implements LocalStorageAdapter {
         return result.data.arrayBuffer();
       }
 
-      return this.base64ToArrayBuffer(result.data);
+      return this.fromBase64(result.data);
     } catch (e: unknown) {
       if (!(e instanceof Error)) {
         throw e;
@@ -194,23 +202,17 @@ class CapacitorStorageAdapter implements LocalStorageAdapter {
     }
   }
 
-  // TODO: Overhaul + move to separate class
-  private arrayBufferToBase64(buffer: ArrayBuffer): string {
-    const bytes = new Uint8Array(buffer);
-    let binary = '';
-    for (let i = 0; i < bytes.byteLength; i++) {
-      binary += String.fromCharCode(bytes[i]);
+  /** Encodes binary or string data to a base64 string for filesystem storage. */
+  private async toBase64(data: ArrayBuffer | string): Promise<string> {
+    if (data instanceof ArrayBuffer) {
+      return new Uint8Array(data).toBase64();
     }
-    return btoa(binary);
+
+    return new TextEncoder().encode(data).toBase64();
   }
 
-  // TODO: Overhaul + move to separate class
-  private base64ToArrayBuffer(base64: string): ArrayBuffer {
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i);
-    }
-    return bytes.buffer;
+  /** Decodes a base64 string back to an ArrayBuffer. */
+  private fromBase64(base64: string): ArrayBuffer {
+    return Uint8Array.fromBase64(base64).buffer;
   }
 }

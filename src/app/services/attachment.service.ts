@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { AttachmentQueue, type AttachmentRecord } from '@powersync/common';
-import { SupabaseStorageAdapter, getPublicUrl } from './supabase-storage-adapter';
-import { CapacitorStorageAdapter } from './capacitor-storage-adapter';
+import { SupabaseStorageAdapter, getPublicUrl } from './remote-storage-adapter.factory';
+import { CapacitorStorageAdapter } from './local-storage-adapter.factory';
 import { SUPABASE_CLIENT } from '@tokens/supabase-client.token';
 import { POWERSYNC_DATABASE } from './tokens/powersync-database.token';
 import { SUPABASE_STORAGE } from './tokens/supabase-storage.token';
