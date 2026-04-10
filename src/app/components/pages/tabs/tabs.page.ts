@@ -12,7 +12,6 @@ import { bookmarkOutline, searchOutline, settingsOutline } from 'ionicons/icons'
 @Component({
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
-  standalone: true,
   imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel],
 })
 export class TabsPage {

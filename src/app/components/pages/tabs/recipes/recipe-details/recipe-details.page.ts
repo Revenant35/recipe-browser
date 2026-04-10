@@ -27,7 +27,6 @@ import { AuthService } from '@services/auth.service';
 @Component({
   selector: 'app-recipe-details',
   templateUrl: 'recipe-details.page.html',
-  standalone: true,
   imports: [
     IonHeader,
     IonToolbar,

@@ -20,7 +20,6 @@ import { RecipeFormComponent } from '@app/components/forms/recipe-form/recipe-fo
 
 @Component({
   selector: 'app-edit-recipe',
-  standalone: true,
   imports: [
     IonButton,
     IonIcon,

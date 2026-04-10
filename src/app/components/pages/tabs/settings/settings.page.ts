@@ -18,7 +18,6 @@ import { AuthService } from '@services/auth.service';
 @Component({
   selector: 'app-settings',
   templateUrl: 'settings.page.html',
-  standalone: true,
   imports: [
     RouterLink,
     IonHeader,

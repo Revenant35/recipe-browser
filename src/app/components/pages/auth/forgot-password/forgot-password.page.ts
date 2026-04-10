@@ -12,7 +12,6 @@ import {
 
 @Component({
   selector: 'app-forgot-password',
-  standalone: true,
   imports: [IonButton, IonIcon, IonSpinner, RouterLink, ForgotPasswordFormComponent],
   templateUrl: './forgot-password.page.html',
   styleUrl: './forgot-password.page.scss',

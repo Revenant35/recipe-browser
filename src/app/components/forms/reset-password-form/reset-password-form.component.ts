@@ -12,7 +12,6 @@ export type ResetPasswordFormValue = z.infer<typeof resetPasswordSchema>;
 
 @Component({
   selector: 'app-reset-password-form',
-  standalone: true,
   imports: [FormField, IonInput],
   templateUrl: './reset-password-form.component.html',
   styleUrl: './reset-password-form.component.scss',

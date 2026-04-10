@@ -11,7 +11,6 @@ export type ForgotPasswordFormValue = z.infer<typeof forgotPasswordSchema>;
 
 @Component({
   selector: 'app-forgot-password-form',
-  standalone: true,
   imports: [FormField, IonInput],
   templateUrl: './forgot-password-form.component.html',
   styleUrl: './forgot-password-form.component.scss',

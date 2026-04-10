@@ -22,7 +22,6 @@ import { RecipeFormComponent } from '@app/components/forms/recipe-form/recipe-fo
 
 @Component({
   selector: 'app-create-recipe',
-  standalone: true,
   imports: [
     IonButton,
     IonIcon,

@@ -19,7 +19,6 @@ import { ProfileFormComponent } from '@app/components/forms/profile-form/profile
 @Component({
   selector: 'app-account',
   templateUrl: 'account.page.html',
-  standalone: true,
   imports: [
     IonHeader,
     IonToolbar,

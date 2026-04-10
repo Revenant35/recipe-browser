@@ -24,7 +24,6 @@ import { RecipeService } from '@services/recipe.service';
   selector: 'app-recipes',
   templateUrl: 'recipes.page.html',
   styleUrls: ['recipes.page.scss'],
-  standalone: true,
   imports: [
     IonHeader,
     IonToolbar,

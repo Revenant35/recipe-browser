@@ -21,7 +21,6 @@ import { CreateRecipe, createRecipeSchema } from '@types';
 
 @Component({
   selector: 'app-recipe-form',
-  standalone: true,
   imports: [
     FormField,
     IonButton,

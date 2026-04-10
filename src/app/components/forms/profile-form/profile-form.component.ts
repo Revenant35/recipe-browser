@@ -14,7 +14,6 @@ import { CreateProfile, createProfileSchema } from '@types';
 
 @Component({
   selector: 'app-profile-form',
-  standalone: true,
   imports: [FormField, IonInput, IonTextarea, IonItem, IonLabel, IonList, IonListHeader],
   templateUrl: './profile-form.component.html',
   styleUrl: './profile-form.component.scss',

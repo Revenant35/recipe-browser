@@ -12,7 +12,6 @@ import {
 
 @Component({
   selector: 'app-login',
-  standalone: true,
   imports: [IonButton, IonIcon, IonSpinner, RouterLink, LoginFormComponent],
   templateUrl: './login.page.html',
   styleUrl: './login.page.scss',

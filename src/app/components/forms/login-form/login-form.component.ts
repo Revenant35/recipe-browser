@@ -12,7 +12,6 @@ export type LoginFormValue = z.infer<typeof loginSchema>;
 
 @Component({
   selector: 'app-login-form',
-  standalone: true,
   imports: [FormField, IonInput],
   templateUrl: './login-form.component.html',
   styleUrl: './login-form.component.scss',

@@ -12,7 +12,6 @@ import {
 
 @Component({
   selector: 'app-reset-password',
-  standalone: true,
   imports: [IonButton, IonIcon, IonSpinner, ResetPasswordFormComponent],
   templateUrl: './reset-password.page.html',
   styleUrl: './reset-password.page.scss',

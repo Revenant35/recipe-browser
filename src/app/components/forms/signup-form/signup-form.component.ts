@@ -12,7 +12,6 @@ export type SignupFormValue = z.infer<typeof signupSchema>;
 
 @Component({
   selector: 'app-signup-form',
-  standalone: true,
   imports: [FormField, IonInput],
   templateUrl: './signup-form.component.html',
   styleUrl: './signup-form.component.scss',

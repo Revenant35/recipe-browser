@@ -28,7 +28,6 @@ import { Recipe } from '@types';
   selector: 'app-explore',
   templateUrl: 'explore.page.html',
   styleUrls: ['explore.page.scss'],
-  standalone: true,
   imports: [
     IonHeader,
     IonToolbar,

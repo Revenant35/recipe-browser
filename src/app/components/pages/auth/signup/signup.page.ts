@@ -12,7 +12,6 @@ import {
 
 @Component({
   selector: 'app-signup',
-  standalone: true,
   imports: [IonButton, IonIcon, IonSpinner, RouterLink, SignupFormComponent],
   templateUrl: './signup.page.html',
   styleUrl: './signup.page.scss',
