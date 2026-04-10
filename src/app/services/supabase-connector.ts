@@ -50,7 +50,7 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
       for (let i = 0; i < transaction.crud.length; i++) {
         const cruds = transaction.crud;
         const op = cruds[i];
-        const table = this.supabase.from(op.table);
+        const table = this.supabase.from(op.table as any);
         batchedOps.push(op);
 
         let result: any;
@@ -74,7 +74,7 @@ export class SupabaseConnector implements PowerSyncBackendConnector {
             break;
           case UpdateType.PATCH:
             batchedOps = [op];
-            result = await table.update(op.opData).eq('id', op.id);
+            result = await table.update(op.opData as any).eq('id', op.id);
             break;
           case UpdateType.DELETE:
             batchedOps = [op];
