@@ -20,7 +20,6 @@ export interface UpdateRecipeInput extends CreateRecipe {
   id: string;
 }
 
-
 @Injectable({ providedIn: 'root' })
 export class RecipeService implements OnDestroy {
   private readonly database = inject(DATABASE);
@@ -77,7 +76,7 @@ export class RecipeService implements OnDestroy {
       },
     });
 
-    return rows.map(this.mapper.fromEntity);
+    return rows.map((row) => this.mapper.fromEntity(row));
   }
 
   async getRecipe(id: string): Promise<Recipe | undefined> {

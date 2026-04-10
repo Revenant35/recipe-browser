@@ -6,7 +6,7 @@ import { Profile } from '@types';
 import { SUPABASE_CLIENT } from '@tokens/supabase-client.token';
 import { DATABASE } from './tokens/database.token';
 import { POWERSYNC_DATABASE } from './tokens/powersync-database.token';
-import { ProfileMapper } from '@app/models/mappers';
+import { ProfileMapper } from '@mappers';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileService implements OnDestroy {
