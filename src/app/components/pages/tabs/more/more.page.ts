@@ -16,8 +16,8 @@ import { logOutOutline, personOutline } from 'ionicons/icons';
 import { AuthService } from '@services/auth.service';
 
 @Component({
-  selector: 'app-settings',
-  templateUrl: 'settings.page.html',
+  selector: 'app-more',
+  templateUrl: 'more.page.html',
   imports: [
     RouterLink,
     IonHeader,
@@ -30,7 +30,7 @@ import { AuthService } from '@services/auth.service';
     IonIcon,
   ],
 })
-export class SettingsPage {
+export class MorePage {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 

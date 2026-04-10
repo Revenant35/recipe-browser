@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
 
-export const settingsRoutes: Routes = [
+export const moreRoutes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./settings.page').then((p) => p.SettingsPage),
+    loadComponent: () => import('./more.page').then((p) => p.MorePage),
   },
   {
     path: 'account',

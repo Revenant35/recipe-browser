@@ -28,8 +28,8 @@ export const tabsRoutes: Routes = [
     resolve: { recipe: recipeResolver },
   },
   {
-    path: 'settings',
-    loadChildren: () => import('./settings/settings.routes').then((r) => r.settingsRoutes),
+    path: 'more',
+    loadChildren: () => import('./more/more.routes').then((r) => r.moreRoutes),
   },
   {
     path: '',
