@@ -31,7 +31,7 @@ export class ResetPasswordPage {
   }
 
   protected async submit(): Promise<void> {
-    if (this.resetForm().form().invalid()) return;
+    if (!this.resetForm().form().valid()) return;
 
     const { password } = this.passwordModel();
     this.loading.set(true);

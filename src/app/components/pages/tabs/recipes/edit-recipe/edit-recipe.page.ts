@@ -83,7 +83,7 @@ export class EditRecipePage {
   }
 
   protected async submit() {
-    if (this.recipeForm().form().invalid()) return;
+    if (!this.recipeForm().form().valid()) return;
 
     this.loading.set(true);
     try {

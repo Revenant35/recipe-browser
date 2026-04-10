@@ -31,7 +31,7 @@ export class SignupPage {
   }
 
   protected async submit(): Promise<void> {
-    if (this.signupForm().form().invalid()) return;
+    if (!this.signupForm().form().valid()) return;
 
     const { email, password } = this.signupModel();
     this.loading.set(true);

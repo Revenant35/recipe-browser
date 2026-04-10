@@ -1,7 +1,7 @@
 <form (submit)="submit()" class="actions">
   <app-login-form #loginForm [(value)]="loginModel"></app-login-form>
 
-  <ion-button expand="block" type="submit" [disabled]="loading() || loginForm.form().invalid()">
+  <ion-button expand="block" type="submit" [disabled]="loading() || !loginForm.form().valid()">
     @if (loading()) {
       <ion-spinner name="crescent"></ion-spinner>
     } @else {

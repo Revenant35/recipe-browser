@@ -62,7 +62,7 @@ export class AccountPage implements OnInit {
   }
 
   protected async save() {
-    if (this.profileForm().form().invalid()) return;
+    if (!this.profileForm().form().valid()) return;
 
     const session = await firstValueFrom(this.auth.session$);
     if (!session?.user) return;

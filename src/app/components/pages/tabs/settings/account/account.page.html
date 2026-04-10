@@ -25,7 +25,7 @@
       <ion-button
         expand="block"
         class="ion-margin-top"
-        [disabled]="saving() || profileForm.form().invalid()"
+        [disabled]="saving() || !profileForm.form().valid()"
         (click)="save()"
       >
         @if (saving()) {

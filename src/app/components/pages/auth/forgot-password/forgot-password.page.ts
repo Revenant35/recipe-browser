@@ -31,7 +31,7 @@ export class ForgotPasswordPage {
   }
 
   protected async submit(): Promise<void> {
-    if (this.forgotForm().form().invalid()) return;
+    if (!this.forgotForm().form().valid()) return;
 
     const { email } = this.emailModel();
     this.loading.set(true);

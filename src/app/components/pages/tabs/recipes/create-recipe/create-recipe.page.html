@@ -12,7 +12,7 @@
 
   <ion-button
     expand="block"
-    [disabled]="loading() || recipeForm.form().invalid()"
+    [disabled]="loading() || !recipeForm.form().valid()"
     (click)="submit()"
     class="mt-6"
   >
