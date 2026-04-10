@@ -1,9 +1,15 @@
-<form (submit)="submit()" class="actions">
-  <app-login-form #loginForm [(value)]="loginModel"></app-login-form>
+<form (submit)="$event.preventDefault(); submit()" novalidate class="actions">
+  <app-login-form [(form)]="form"></app-login-form>
 
-  <ion-button expand="block" type="submit" [disabled]="loading() || !loginForm.form().valid()">
-    @if (loading()) {
+  <ion-button
+    expand="block"
+    type="submit"
+    [disabled]="isSubmitting() || !canSubmit()"
+    [attr.aria-label]="isSubmitting() ? 'Signing in' : null"
+  >
+    @if (isSubmitting()) {
       <ion-spinner name="crescent"></ion-spinner>
+      <span class="sr-only">Signing in...</span>
     } @else {
       <ion-icon slot="start" name="log-in-outline"></ion-icon>
       Sign In

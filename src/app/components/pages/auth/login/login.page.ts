@@ -1,4 +1,4 @@
-import { Component, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { IonButton, IonIcon, IonSpinner } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
 import { RouterLink, Router } from '@angular/router';
@@ -8,7 +8,9 @@ import { AuthService } from '@services/auth.service';
 import {
   LoginFormComponent,
   LoginFormValue,
+  loginSchema,
 } from '@app/components/forms/login-form/login-form.component';
+import { form, validateStandardSchema } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-login',
@@ -21,33 +23,46 @@ export class LoginPage {
   private toastCtrl = inject(ToastController);
   private router = inject(Router);
 
-  private loginForm = viewChild.required<LoginFormComponent>('loginForm');
+  protected formModel = signal<LoginFormValue>({ email: '', password: '' });
+  protected isSubmitting = signal(false);
 
-  protected loginModel = signal<LoginFormValue>({ email: '', password: '' });
-  protected loading = signal(false);
+  public readonly form = form(this.formModel, (p) => {
+    validateStandardSchema(p, loginSchema);
+  });
+
+  protected canSubmit = computed(() => this.form().valid());
 
   constructor() {
     addIcons({ logInOutline });
   }
 
   protected async submit(): Promise<void> {
-    if (!this.loginForm().form().valid()) return;
+    if (!this.canSubmit()) return;
 
-    const { email, password } = this.loginModel();
-    this.loading.set(true);
-    const { error } = await this.auth.signIn(email.trim(), password);
-    this.loading.set(false);
+    const { email, password } = this.formModel();
 
-    if (error) {
+    this.isSubmitting.set(true);
+
+    try {
+      const { error } = await this.auth.signIn(email.trim(), password);
+      if (error) {
+        throw error;
+      }
+      await this.router.navigateByUrl('/saved');
+    } catch (e: unknown) {
+      if (!(e instanceof Error)) {
+        throw e;
+      }
+
       const toast = await this.toastCtrl.create({
-        message: error.message,
+        message: e.message,
         duration: 5000,
         color: 'danger',
       });
-      await toast.present();
-      return;
-    }
 
-    await this.router.navigateByUrl('/saved');
+      await toast.present();
+    } finally {
+      this.isSubmitting.set(false);
+    }
   }
 }

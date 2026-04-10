@@ -1,13 +1,15 @@
-import { Component, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { IonButton, IonIcon, IonSpinner } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
 import { RouterLink } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { mailOutline } from 'ionicons/icons';
+import { form, validateStandardSchema } from '@angular/forms/signals';
 import { AuthService } from '@services/auth.service';
 import {
   ForgotPasswordFormComponent,
   ForgotPasswordFormValue,
+  forgotPasswordSchema,
 } from '@app/components/forms/forgot-password-form/forgot-password-form.component';
 
 @Component({
@@ -20,34 +22,47 @@ export class ForgotPasswordPage {
   private auth = inject(AuthService);
   private toastCtrl = inject(ToastController);
 
-  private forgotForm = viewChild.required<ForgotPasswordFormComponent>('forgotForm');
-
-  protected emailModel = signal<ForgotPasswordFormValue>({ email: '' });
-  protected loading = signal(false);
+  protected formModel = signal<ForgotPasswordFormValue>({ email: '' });
+  protected isSubmitting = signal(false);
   protected sent = signal(false);
+
+  public readonly form = form(this.formModel, (p) => {
+    validateStandardSchema(p, forgotPasswordSchema);
+  });
+
+  protected canSubmit = computed(() => this.form().valid());
 
   constructor() {
     addIcons({ mailOutline });
   }
 
   protected async submit(): Promise<void> {
-    if (!this.forgotForm().form().valid()) return;
+    if (!this.canSubmit()) return;
 
-    const { email } = this.emailModel();
-    this.loading.set(true);
-    const { error } = await this.auth.resetPasswordForEmail(email.trim());
-    this.loading.set(false);
+    const { email } = this.formModel();
 
-    if (error) {
+    this.isSubmitting.set(true);
+
+    try {
+      const { error } = await this.auth.resetPasswordForEmail(email.trim());
+      if (error) {
+        throw error;
+      }
+      this.sent.set(true);
+    } catch (e: unknown) {
+      if (!(e instanceof Error)) {
+        throw e;
+      }
+
       const toast = await this.toastCtrl.create({
-        message: error.message,
+        message: e.message,
         duration: 5000,
         color: 'danger',
       });
-      await toast.present();
-      return;
-    }
 
-    this.sent.set(true);
+      await toast.present();
+    } finally {
+      this.isSubmitting.set(false);
+    }
   }
 }

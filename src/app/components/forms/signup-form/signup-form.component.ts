@@ -1,6 +1,6 @@
 import { Component, model } from '@angular/core';
 import { z } from 'zod';
-import { form, FormField, validateStandardSchema } from '@angular/forms/signals';
+import { FieldTree, FormField } from '@angular/forms/signals';
 import { IonInput } from '@ionic/angular/standalone';
 
 export const signupSchema = z.object({
@@ -17,9 +17,5 @@ export type SignupFormValue = z.infer<typeof signupSchema>;
   styleUrl: './signup-form.component.scss',
 })
 export class SignupFormComponent {
-  public readonly value = model.required<SignupFormValue>();
-
-  public readonly form = form(this.value, (p) => {
-    validateStandardSchema(p, signupSchema);
-  });
+  public readonly form = model.required<FieldTree<SignupFormValue>>();
 }

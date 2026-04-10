@@ -1,6 +1,6 @@
 import { Component, model } from '@angular/core';
 import { z } from 'zod';
-import { form, FormField, validateStandardSchema } from '@angular/forms/signals';
+import { FieldTree, FormField } from '@angular/forms/signals';
 import { IonInput } from '@ionic/angular/standalone';
 
 export const forgotPasswordSchema = z.object({
@@ -16,9 +16,5 @@ export type ForgotPasswordFormValue = z.infer<typeof forgotPasswordSchema>;
   styleUrl: './forgot-password-form.component.scss',
 })
 export class ForgotPasswordFormComponent {
-  public readonly value = model.required<ForgotPasswordFormValue>();
-
-  public readonly form = form(this.value, (p) => {
-    validateStandardSchema(p, forgotPasswordSchema);
-  });
+  public readonly form = model.required<FieldTree<ForgotPasswordFormValue>>();
 }

@@ -1,26 +1,30 @@
 <ion-input
   type="email"
+  autocomplete="email"
   label="Email"
   labelPlacement="floating"
   fill="outline"
-  [formField]="form.email"
+  [formField]="form().email"
+  [attr.aria-describedby]="form().email().touched() && form().email().invalid() ? 'login-email-error' : null"
   class="mb-2"
 ></ion-input>
-@if (form.email().touched() && form.email().invalid()) {
-  <p class="text-red-500 text-sm px-4">
-    {{ form.email().errors()[0].message }}
+@if (form().email().touched() && form().email().invalid()) {
+  <p id="login-email-error" role="alert" class="text-red-500 text-sm px-4">
+    {{ form().email().errors()[0].message }}
   </p>
 }
 
 <ion-input
   type="password"
+  autocomplete="current-password"
   label="Password"
   labelPlacement="floating"
   fill="outline"
-  [formField]="form.password"
+  [formField]="form().password"
+  [attr.aria-describedby]="form().password().touched() && form().password().invalid() ? 'login-password-error' : null"
 ></ion-input>
-@if (form.password().touched() && form.password().invalid()) {
-  <p class="text-red-500 text-sm px-4">
-    {{ form.password().errors()[0].message }}
+@if (form().password().touched() && form().password().invalid()) {
+  <p id="login-password-error" role="alert" class="text-red-500 text-sm px-4">
+    {{ form().password().errors()[0].message }}
   </p>
 }
