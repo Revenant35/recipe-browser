@@ -12,7 +12,10 @@ import { ToastController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '@services/auth.service';
 import { RecipeService } from '@services/recipe.service';
-import { RecipeFormComponent, RecipeFormValue } from '@app/components/recipe-form/recipe-form.component';
+import {
+  RecipeFormComponent,
+  RecipeFormValue,
+} from '@app/components/forms/recipe-form/recipe-form.component';
 
 @Component({
   selector: 'app-create-recipe',
@@ -43,10 +46,7 @@ export class CreateRecipePage {
         throw new Error('You must be logged in to create a recipe.');
       }
 
-      const recipeId = await this.recipeService.createRecipe({
-        ...value,
-        user_id: session.user.id,
-      });
+      const recipeId = await this.recipeService.createRecipe(value);
 
       // Auto-save the user's own recipe to their saved list
       await this.recipeService.saveRecipe(session.user.id, recipeId);

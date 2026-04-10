@@ -1,10 +1,34 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Profile } from '@types';
 import { BadgeRow, ProfileRow, WallpaperRow } from '@entities';
+import { BadgeMapper } from './badge.mapper';
+import { WallpaperMapper } from './wallpaper.mapper';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileMapper {
-  toEntity(row: Profile): ProfileRow {
+  private readonly badgeMapper = inject(BadgeMapper);
+  private readonly wallpaperMapper = inject(WallpaperMapper);
+
+  toEntity(
+    profile: Profile,
+  ): ProfileRow & { badge: BadgeRow | null; wallpaper: WallpaperRow | null } {
+    return {
+      id: profile.id,
+      updated_at: profile.updated_at,
+      username: profile.username,
+      full_name: profile.full_name,
+      avatar_url: profile.avatar_url,
+      bio: profile.bio,
+      wallpaper_id: profile.wallpaper?.id ?? null,
+      badge_id: profile.badge?.id ?? null,
+      badge: profile.badge ? this.badgeMapper.toEntity(profile.badge) : null,
+      wallpaper: profile.wallpaper ? this.wallpaperMapper.toEntity(profile.wallpaper) : null,
+    };
+  }
+
+  fromEntity(
+    row: ProfileRow & { badge: BadgeRow | null; wallpaper: WallpaperRow | null },
+  ): Profile {
     return {
       id: row.id,
       updated_at: row.updated_at,
@@ -12,31 +36,8 @@ export class ProfileMapper {
       full_name: row.full_name,
       avatar_url: row.avatar_url,
       bio: row.bio,
-      wallpaper_id: row.wallpaper?.id ?? null,
-      badge_id: row.badge?.id ?? null,
-    };
-  }
-
-  fromEntity(entity: { profile: ProfileRow; badge: BadgeRow; wallpaper: WallpaperRow }): Profile {
-    return {
-      id: entity.profile.id,
-      updated_at: entity.profile.updated_at,
-      username: entity.profile.username,
-      full_name: entity.profile.full_name,
-      avatar_url: entity.profile.avatar_url,
-      bio: entity.profile.bio,
-      wallpaper: {
-        id: entity.wallpaper.id,
-        created_at: entity.wallpaper.created_at,
-        name: entity.wallpaper.name,
-        storage_path: entity.wallpaper.storage_path,
-      },
-      badge: {
-        id: entity.badge.id,
-        created_at: entity.badge.created_at,
-        name: entity.badge.name,
-        storage_path: entity.badge.storage_path,
-      },
+      wallpaper: row.wallpaper ? this.wallpaperMapper.fromEntity(row.wallpaper) : null,
+      badge: row.badge ? this.badgeMapper.fromEntity(row.badge) : null,
     };
   }
 }

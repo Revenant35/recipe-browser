@@ -29,7 +29,6 @@ export interface Recipe {
   id: string;
   created_at: Date | null;
   name: string;
-  user_id: string;
   servings: number | null;
   prep_time_minutes: number | null;
   cook_time_minutes: number | null;
@@ -64,4 +63,5 @@ export interface Recipe {
     user_id: string;
     value: string;
   }[];
+  author: Profile;
 }

@@ -1,19 +1,5 @@
-import {
-  Component,
-  effect,
-  inject,
-  input,
-  OnInit,
-  output,
-  signal,
-} from '@angular/core';
-import {
-  ReactiveFormsModule,
-  FormGroup,
-  FormControl,
-  FormArray,
-  Validators,
-} from '@angular/forms';
+import { Component, effect, inject, input, OnInit, output, signal } from '@angular/core';
+import { ReactiveFormsModule, FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
 import {
   IonButton,
   IonIcon,
@@ -32,7 +18,6 @@ import {
 import { addIcons } from 'ionicons';
 import { addOutline, trashOutline, saveOutline } from 'ionicons/icons';
 import { ItemReorderEventDetail } from '@ionic/angular';
-
 import { RecipeService } from '@services/recipe.service';
 import { RecipeDifficulty, Recipe } from '@types';
 
@@ -123,23 +108,19 @@ export class RecipeFormComponent implements OnInit {
 
       this.ingredients.clear();
       for (const ingredient of r.ingredients) {
-        this.ingredients.push(
-          new FormControl(ingredient.value, { nonNullable: true })
-        );
+        this.ingredients.push(new FormControl(ingredient.value, { nonNullable: true }));
       }
 
       this.instructions.clear();
       for (const instruction of r.instructions) {
-        this.instructions.push(
-          new FormControl(instruction.value, { nonNullable: true })
-        );
+        this.instructions.push(new FormControl(instruction.value, { nonNullable: true }));
       }
     });
   }
 
   async ngOnInit() {
-    const difficulties = await this.recipeService.getDifficulties();
-    this.difficulties.set(difficulties);
+    // TODO: Bad array >:(
+    this.difficulties.set(['Easy', 'Medium', 'Hard']);
   }
 
   get ingredients() {
@@ -203,8 +184,7 @@ export class RecipeFormComponent implements OnInit {
       carbs_grams: v.carbs_grams ?? undefined,
       fat_grams: v.fat_grams ?? undefined,
       ingredients: (v.ingredients?.filter((i) => i?.trim()) as string[]) ?? [],
-      instructions:
-        (v.instructions?.filter((i) => i?.trim()) as string[]) ?? [],
+      instructions: (v.instructions?.filter((i) => i?.trim()) as string[]) ?? [],
     };
 
     this.saved.emit(value);

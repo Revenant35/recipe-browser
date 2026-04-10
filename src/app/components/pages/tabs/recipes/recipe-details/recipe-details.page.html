@@ -8,8 +8,8 @@
       <ion-button (click)="toggleSave()">
         <ion-icon
           slot="icon-only"
-          [name]="isSaved() ? 'bookmark' : 'bookmark-outline'"
-          [color]="isSaved() ? 'primary' : 'medium'"
+          [name]="recipe().is_saved ? 'bookmark' : 'bookmark-outline'"
+          [color]="recipe().is_saved ? 'primary' : 'medium'"
         ></ion-icon>
       </ion-button>
       @if (isOwner()) {
@@ -31,12 +31,12 @@
   <div class="ion-padding">
     <!-- Overview -->
     <section class="mb-4">
-      @if (recipe().difficultyLevel || recipe().servings) {
+      @if (recipe().difficulty || recipe().servings) {
         <div class="flex items-center gap-2 text-[color:var(--ion-color-medium)] mb-3">
-          @if (recipe().difficultyLevel; as difficulty) {
+          @if (recipe().difficulty; as difficulty) {
             <span>{{ difficulty.name }}</span>
           }
-          @if (recipe().difficultyLevel && recipe().servings) {
+          @if (recipe().difficulty && recipe().servings) {
             <span class="font-bold">&middot;</span>
           }
           @if (recipe().servings; as servings) {
@@ -49,15 +49,15 @@
 
       <div class="flex items-center gap-3 mb-4">
         <ion-avatar>
-          @if (author().avatar_url) {
-            <img [src]="author().avatar_url" />
+          @if (recipe().author.avatar_url; as avatur_url) {
+            <img [src]="avatur_url" alt="Author's profile picture" />
           } @else {
             <div class="flex items-center justify-center w-full h-full bg-[var(--ion-color-light)] text-[color:var(--ion-color-medium)]">
               <ion-icon name="person"></ion-icon>
             </div>
           }
         </ion-avatar>
-        <span>{{ author().full_name || author().username }}</span>
+        <span>{{ recipe().author.full_name || recipe().author.username }}</span>
       </div>
 
       @if (recipe().tags.length) {

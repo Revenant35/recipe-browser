@@ -61,7 +61,7 @@ export class AttachmentService {
 
   async deleteFile(
     id: string,
-    updateHook?: (transaction: any, attachment: AttachmentRecord) => Promise<void>,
+    updateHook?: (transaction: unknown, attachment: AttachmentRecord) => Promise<void>,
   ): Promise<void> {
     await this.queue.deleteFile({ id, updateHook });
   }

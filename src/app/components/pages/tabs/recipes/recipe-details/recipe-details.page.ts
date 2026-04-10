@@ -1,7 +1,6 @@
 import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-
 import {
   IonHeader,
   IonToolbar,
@@ -20,8 +19,8 @@ import {
 } from '@ionic/angular/standalone';
 import { ActionSheetController, AlertController, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { bookmark, bookmarkOutline, clipboardOutline, createOutline, ellipsisHorizontal, trashOutline } from 'ionicons/icons';
-import { Recipe, Profile } from '@types';
+import { clipboardOutline, createOutline, ellipsisHorizontal, trashOutline } from 'ionicons/icons';
+import { Recipe } from '@types';
 import { RecipeService } from '@services/recipe.service';
 import { AuthService } from '@services/auth.service';
 
@@ -55,10 +54,8 @@ export class RecipeDetailsPage implements OnInit {
   private router = inject(Router);
 
   recipe = input.required<Recipe>();
-  author = input.required<Profile>();
 
   protected isOwner = signal(false);
-  protected isSaved = signal(false);
   protected checkedIngredients = signal(new Set<string>());
 
   totalTime = computed(() => {
@@ -73,24 +70,18 @@ export class RecipeDetailsPage implements OnInit {
   }
 
   async ngOnInit() {
-    const [session, saved] = await Promise.all([
-      firstValueFrom(this.auth.session$),
-      this.recipeService.isRecipeSaved(this.recipe().id),
-    ]);
-    this.isOwner.set(session?.user?.id === this.recipe().user_id);
-    this.isSaved.set(saved);
+    const session = await firstValueFrom(this.auth.session$);
+    this.isOwner.set(session?.user?.id === this.recipe().author.id);
   }
 
   async toggleSave() {
     const session = await firstValueFrom(this.auth.session$);
     if (!session?.user) return;
 
-    if (this.isSaved()) {
+    if (this.recipe().is_saved) {
       await this.recipeService.unsaveRecipe(this.recipe().id);
-      this.isSaved.set(false);
     } else {
       await this.recipeService.saveRecipe(session.user.id, this.recipe().id);
-      this.isSaved.set(true);
     }
   }
 

@@ -18,10 +18,11 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { bookmark, bookmarkOutline } from 'ionicons/icons';
-import { RecipeService, ExploreRecipe } from '@services/recipe.service';
+import { RecipeService } from '@services/recipe.service';
 import { AuthService } from '@services/auth.service';
 import { firstValueFrom } from 'rxjs';
 import { InfiniteScrollCustomEvent } from '@ionic/angular';
+import { Recipe } from '@app/models/types';
 
 @Component({
   selector: 'app-explore',
@@ -51,7 +52,7 @@ export class ExplorePage implements ViewWillEnter {
 
   private readonly PAGE_SIZE = 20;
 
-  protected recipes = signal<ExploreRecipe[]>([]);
+  protected recipes = signal<Recipe[]>([]);
   protected totalCount = signal(0);
   protected isLoading = signal(false);
   protected searchQuery = signal('');

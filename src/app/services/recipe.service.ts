@@ -14,10 +14,12 @@ import { SUPABASE_CLIENT } from '@tokens/supabase-client.token';
 import { RecipeMapper } from '@mappers';
 import { AuthService } from './auth.service';
 import { DATABASE } from './tokens/database.token';
+import { POWERSYNC_DATABASE } from './tokens/powersync-database.token';
 
 @Injectable({ providedIn: 'root' })
 export class RecipeService implements OnDestroy {
   private readonly database = inject(DATABASE);
+  private readonly powersync = inject(POWERSYNC_DATABASE);
   private readonly supabase = inject(SUPABASE_CLIENT);
   private readonly auth = inject(AuthService);
   private readonly mapper = inject(RecipeMapper);
@@ -36,7 +38,7 @@ export class RecipeService implements OnDestroy {
   }
 
   private async watchRecipes(): Promise<void> {
-    const watch = this.database.watch('SELECT id FROM recipes', [], {
+    const watch = this.powersync.watch('SELECT id FROM recipes', [], {
       signal: this.abortController.signal,
     });
 
@@ -54,7 +56,7 @@ export class RecipeService implements OnDestroy {
     if (userId) {
       savedRecipeWhereClause = eq(savedRecipes.user_id, userId);
     } else {
-      savedRecipeWhereClause = isNull(savedRecipes.user_id);
+      savedRecipeWhereClause = undefined;
     }
 
     const rows = await this.database.query.recipes.findMany({
@@ -65,8 +67,8 @@ export class RecipeService implements OnDestroy {
         notes: true,
         savedRecipes: {
           where: savedRecipeWhereClause,
-          limit: 1,
         },
+        profile: { with: { badge: true, wallpaper: true } },
       },
     });
 
@@ -81,7 +83,7 @@ export class RecipeService implements OnDestroy {
     if (userId) {
       savedRecipeWhereClause = eq(savedRecipes.user_id, userId);
     } else {
-      savedRecipeWhereClause = isNull(savedRecipes.user_id);
+      savedRecipeWhereClause = undefined;
     }
 
     const row = await this.database.query.recipes.findFirst({
@@ -91,9 +93,9 @@ export class RecipeService implements OnDestroy {
         ingredients: { orderBy: asc(recipeIngredients.order) },
         instructions: { orderBy: asc(recipeInstructions.order) },
         notes: true,
+        profile: { with: { badge: true, wallpaper: true } },
         savedRecipes: {
           where: savedRecipeWhereClause,
-          limit: 1,
         },
       },
     });
@@ -105,7 +107,7 @@ export class RecipeService implements OnDestroy {
     return this.mapper.fromEntity(row);
   }
 
-  async createRecipe(recipe: Omit<Recipe, 'id' | 'created_at'>): Promise<string> {
+  async createRecipe(recipe: Omit<Recipe, 'id' | 'created_at'>): Promise<Recipe> {
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
 

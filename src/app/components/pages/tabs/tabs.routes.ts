@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authorResolver, recipeResolver } from '@resolvers';
+import { recipeResolver } from '@resolvers';
 
 export const tabsRoutes: Routes = [
   {
@@ -25,7 +25,7 @@ export const tabsRoutes: Routes = [
     path: 'recipes/:id',
     loadComponent: () =>
       import('./recipes/recipe-details/recipe-details.page').then((p) => p.RecipeDetailsPage),
-    resolve: { recipe: recipeResolver, author: authorResolver },
+    resolve: { recipe: recipeResolver },
   },
   {
     path: 'settings',

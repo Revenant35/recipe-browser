@@ -2,6 +2,8 @@ import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { relations } from 'drizzle-orm';
 import { DrizzleAppSchema, type DrizzleTableWithPowerSyncOptions } from '@powersync/drizzle-driver';
 
+export { SupabaseSchema } from './supabase';
+
 export const badges = sqliteTable('badges', {
   id: text('id').primaryKey().notNull(),
   created_at: text('created_at'),
@@ -105,7 +107,7 @@ export const wallpapersRelations = relations(wallpapers, ({ many }) => ({
   profiles: many(profiles),
 }));
 
-export const profilesRelations = relations(profiles, ({ one }) => ({
+export const profilesRelations = relations(profiles, ({ one, many }) => ({
   wallpaper: one(wallpapers, {
     fields: [profiles.wallpaper_id],
     references: [wallpapers.id],
@@ -114,6 +116,7 @@ export const profilesRelations = relations(profiles, ({ one }) => ({
     fields: [profiles.badge_id],
     references: [badges.id],
   }),
+  recipes: many(recipes),
 }));
 
 export const recipeTagsRelations = relations(recipeTags, ({ one }) => ({
@@ -123,7 +126,11 @@ export const recipeTagsRelations = relations(recipeTags, ({ one }) => ({
   }),
 }));
 
-export const recipesRelations = relations(recipes, ({ many }) => ({
+export const recipesRelations = relations(recipes, ({ one, many }) => ({
+  profile: one(profiles, {
+    fields: [recipes.user_id],
+    references: [profiles.id],
+  }),
   recipeTags: many(recipeTags),
   ingredients: many(recipeIngredients),
   instructions: many(recipeInstructions),

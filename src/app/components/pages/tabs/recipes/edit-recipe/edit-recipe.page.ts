@@ -11,7 +11,10 @@ import {
 import { ToastController } from '@ionic/angular';
 import { RecipeService } from '@services/recipe.service';
 import { Recipe } from '@types';
-import { RecipeFormComponent, RecipeFormValue } from '@app/components/recipe-form/recipe-form.component';
+import {
+  RecipeFormComponent,
+  RecipeFormValue,
+} from '@app/components/forms/recipe-form/recipe-form.component';
 
 @Component({
   selector: 'app-edit-recipe',
