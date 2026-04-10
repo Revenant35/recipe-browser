@@ -1,16 +1,19 @@
-import { Component, inject, signal } from '@angular/core';
-import { IonButton, IonIcon, IonInput, IonSpinner } from '@ionic/angular/standalone';
+import { Component, inject, signal, viewChild } from '@angular/core';
+import { IonButton, IonIcon, IonSpinner } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
-import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { logInOutline } from 'ionicons/icons';
 import { AuthService } from '@services/auth.service';
+import {
+  LoginFormComponent,
+  LoginFormValue,
+} from '@app/components/forms/login-form/login-form.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [IonButton, IonIcon, IonInput, IonSpinner, ReactiveFormsModule, RouterLink],
+  imports: [IonButton, IonIcon, IonSpinner, RouterLink, LoginFormComponent],
   templateUrl: './login.page.html',
   styleUrl: './login.page.scss',
 })
@@ -19,10 +22,9 @@ export class LoginPage {
   private toastCtrl = inject(ToastController);
   private router = inject(Router);
 
-  protected loginForm = new FormGroup({
-    email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required]),
-  });
+  private loginForm = viewChild.required<LoginFormComponent>('loginForm');
+
+  protected loginModel = signal<LoginFormValue>({ email: '', password: '' });
   protected loading = signal(false);
 
   constructor() {
@@ -30,11 +32,11 @@ export class LoginPage {
   }
 
   protected async submit(): Promise<void> {
-    if (this.loginForm.invalid) return;
+    if (!this.loginForm().form().valid()) return;
 
-    const { email, password } = this.loginForm.value;
+    const { email, password } = this.loginModel();
     this.loading.set(true);
-    const { error } = await this.auth.signIn(email!.trim(), password!);
+    const { error } = await this.auth.signIn(email.trim(), password);
     this.loading.set(false);
 
     if (error) {

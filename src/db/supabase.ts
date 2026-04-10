@@ -202,6 +202,24 @@ export interface SupabaseSchema {
           },
         ];
       };
+      recipe_difficulties: {
+        Row: {
+          id: string;
+          created_at: string;
+          name: string;
+        };
+        Insert: {
+          id?: string;
+          created_at?: string;
+          name: string;
+        };
+        Update: {
+          id?: string;
+          created_at?: string;
+          name?: string;
+        };
+        Relationships: [];
+      };
       recipes: {
         Row: {
           calories: number | null;
@@ -251,7 +269,44 @@ export interface SupabaseSchema {
           source?: string | null;
           user_id?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'recipes_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      saved_recipes: {
+        Row: {
+          id: string;
+          created_at: string;
+          user_id: string;
+          recipe_id: string;
+        };
+        Insert: {
+          id?: string;
+          created_at?: string;
+          user_id: string;
+          recipe_id: string;
+        };
+        Update: {
+          id?: string;
+          created_at?: string;
+          user_id?: string;
+          recipe_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'saved_recipes_recipe_id_fkey';
+            columns: ['recipe_id'];
+            isOneToOne: false;
+            referencedRelation: 'recipes';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       wallpapers: {
         Row: {

@@ -4,7 +4,7 @@ import { POWERSYNC_DATABASE } from './tokens/powersync-database.token';
 import { LocalStorageAdapterFactory } from './local-storage-adapter.factory';
 import { RemoteStorageAdapterFactory } from './remote-storage-adapter.factory';
 
-export const ATTACHMENT_BUCKETS = ['avatars'] as const;
+export const ATTACHMENT_BUCKETS = ['profiles'] as const;
 export type AttachmentBucket = (typeof ATTACHMENT_BUCKETS)[number];
 
 /**
@@ -42,7 +42,7 @@ export class AttachmentQueueManager {
   /** Initializes local storage and starts sync for all registered queues. */
   public async init() {
     return await Promise.all(
-      this.queues.values().map(async (queue) => {
+      [...this.queues.values()].map(async (queue) => {
         await queue.localStorage.initialize();
         await queue.startSync();
       }),
@@ -51,7 +51,7 @@ export class AttachmentQueueManager {
 
   /** Stops sync for all registered queues. */
   public async stop() {
-    return await Promise.all(this.queues.values().map((queue) => queue.stopSync()));
+    return await Promise.all([...this.queues.values()].map((queue) => queue.stopSync()));
   }
 
   private addQueues(keys: readonly AttachmentBucket[]) {

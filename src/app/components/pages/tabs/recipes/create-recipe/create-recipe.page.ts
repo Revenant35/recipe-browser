@@ -1,6 +1,9 @@
-import { Component, inject, viewChild } from '@angular/core';
+import { Component, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import {
+  IonButton,
+  IonIcon,
+  IonSpinner,
   IonHeader,
   IonToolbar,
   IonTitle,
@@ -9,18 +12,21 @@ import {
   IonBackButton,
 } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import { saveOutline } from 'ionicons/icons';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '@services/auth.service';
 import { RecipeService } from '@services/recipe.service';
-import {
-  RecipeFormComponent,
-  RecipeFormValue,
-} from '@app/components/forms/recipe-form/recipe-form.component';
+import { CreateRecipe } from '@types';
+import { RecipeFormComponent } from '@app/components/forms/recipe-form/recipe-form.component';
 
 @Component({
   selector: 'app-create-recipe',
   standalone: true,
   imports: [
+    IonButton,
+    IonIcon,
+    IonSpinner,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -37,16 +43,40 @@ export class CreateRecipePage {
   private toastCtrl = inject(ToastController);
   private router = inject(Router);
 
-  private recipeForm = viewChild<RecipeFormComponent>('recipeForm');
+  private recipeForm = viewChild.required<RecipeFormComponent>('recipeForm');
 
-  protected async submit(value: RecipeFormValue) {
+  protected recipeModel = signal<CreateRecipe>({
+    name: '',
+    description: '',
+    source: null,
+    servings: null,
+    prep_time_minutes: null,
+    cook_time_minutes: null,
+    difficulty: null,
+    calories: null,
+    protein_grams: null,
+    carbs_grams: null,
+    fat_grams: null,
+    ingredients: [],
+    instructions: [],
+  });
+  protected loading = signal(false);
+
+  constructor() {
+    addIcons({ saveOutline });
+  }
+
+  protected async submit() {
+    if (this.recipeForm().form().invalid()) return;
+
+    this.loading.set(true);
     try {
       const session = await firstValueFrom(this.auth.session$);
       if (!session?.user) {
         throw new Error('You must be logged in to create a recipe.');
       }
 
-      const recipeId = await this.recipeService.createRecipe(value);
+      const recipeId = await this.recipeService.createRecipe(this.recipeModel());
 
       // Auto-save the user's own recipe to their saved list
       await this.recipeService.saveRecipe(session.user.id, recipeId);
@@ -66,7 +96,7 @@ export class CreateRecipePage {
       });
       await toast.present();
     } finally {
-      this.recipeForm()?.resetLoading();
+      this.loading.set(false);
     }
   }
 }

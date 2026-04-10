@@ -4,7 +4,7 @@ import { Directory, FilesystemPlugin } from '@capacitor/filesystem';
 import { FILESYSTEM } from './tokens/filesystem.token';
 
 /** Factory for creating {@link LocalStorageAdapter} instances backed by the Capacitor Filesystem API. */
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class LocalStorageAdapterFactory {
   private readonly filesystem = inject(FILESYSTEM);
 
@@ -58,20 +58,7 @@ class CapacitorStorageAdapter implements LocalStorageAdapter {
         directory: this.directory,
         recursive: true,
       });
-    } catch (e: unknown) {
-      if (!(e instanceof Error)) {
-        throw e;
-      }
 
-      if (e?.message?.includes('--TODO--')) {
-        // File already exists
-        throw new Error('TODO');
-      }
-
-      throw e;
-    }
-
-    try {
       const stat = await this.filesystem.stat({
         path: filePath,
         directory: this.directory,
@@ -83,9 +70,8 @@ class CapacitorStorageAdapter implements LocalStorageAdapter {
         throw e;
       }
 
-      if (e?.message?.includes('--TODO--')) {
-        // File doesn't exist
-        throw new Error('TODO');
+      if (e?.message?.includes('Entry does not exist.')) {
+        throw new Error('Failed to write file');
       }
 
       throw e;
@@ -109,16 +95,14 @@ class CapacitorStorageAdapter implements LocalStorageAdapter {
         throw e;
       }
 
-      if (e?.message?.includes('--TODO--')) {
-        // File doesn't exist
-        throw new Error('TODO');
+      if (e?.message?.includes('File does not exist.')) {
+        throw new Error('Could not read file, file does not exist');
       }
 
       throw e;
     }
   }
 
-  // TODO: Better error handling
   async deleteFile(filePath: string): Promise<void> {
     try {
       await this.filesystem.deleteFile({
@@ -130,8 +114,7 @@ class CapacitorStorageAdapter implements LocalStorageAdapter {
         throw e;
       }
 
-      if (e?.message?.includes('--TODO--')) {
-        // File doesn't exist
+      if (e?.message?.includes('File does not exist.')) {
         return;
       }
 
@@ -151,8 +134,7 @@ class CapacitorStorageAdapter implements LocalStorageAdapter {
         throw e;
       }
 
-      if (e?.message?.includes('--TODO--')) {
-        // File doesn't exist
+      if (e?.message?.includes('Entry does not exist.')) {
         return false;
       }
 
@@ -172,8 +154,7 @@ class CapacitorStorageAdapter implements LocalStorageAdapter {
         throw e;
       }
 
-      if (e?.message?.includes('--TODO--')) {
-        // Directory already exists
+      if (e?.message?.includes('Current directory does already exist.')) {
         return;
       }
 
@@ -193,8 +174,7 @@ class CapacitorStorageAdapter implements LocalStorageAdapter {
         throw e;
       }
 
-      if (e?.message?.includes('--TODO--')) {
-        // Directory doesn't exist
+      if (e?.message?.includes('Folder does not exist.')) {
         return;
       }
 
@@ -204,15 +184,22 @@ class CapacitorStorageAdapter implements LocalStorageAdapter {
 
   /** Encodes binary or string data to a base64 string for filesystem storage. */
   private async toBase64(data: ArrayBuffer | string): Promise<string> {
-    if (data instanceof ArrayBuffer) {
-      return new Uint8Array(data).toBase64();
+    const bytes =
+      data instanceof ArrayBuffer ? new Uint8Array(data) : new TextEncoder().encode(data);
+    let binary = '';
+    for (const byte of bytes) {
+      binary += String.fromCharCode(byte);
     }
-
-    return new TextEncoder().encode(data).toBase64();
+    return btoa(binary);
   }
 
   /** Decodes a base64 string back to an ArrayBuffer. */
   private fromBase64(base64: string): ArrayBuffer {
-    return Uint8Array.fromBase64(base64).buffer;
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes.buffer;
   }
 }

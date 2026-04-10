@@ -1,30 +1,15 @@
-<form [formGroup]="loginForm" (ngSubmit)="submit()" class="actions">
-    <ion-input
-      type="email"
-      label="Email"
-      labelPlacement="floating"
-      fill="outline"
-      formControlName="email"
-    ></ion-input>
+<form (submit)="submit()" class="actions">
+  <app-login-form #loginForm [(value)]="loginModel"></app-login-form>
 
-    <ion-input
-      type="password"
-      label="Password"
-      labelPlacement="floating"
-      fill="outline"
-      formControlName="password"
-      (keyup.enter)="submit()"
-    ></ion-input>
+  <ion-button expand="block" type="submit" [disabled]="loading() || loginForm.form().invalid()">
+    @if (loading()) {
+      <ion-spinner name="crescent"></ion-spinner>
+    } @else {
+      <ion-icon slot="start" name="log-in-outline"></ion-icon>
+      Sign In
+    }
+  </ion-button>
 
-    <ion-button expand="block" type="submit" [disabled]="loading() || loginForm.invalid">
-      @if (loading()) {
-        <ion-spinner name="crescent"></ion-spinner>
-      } @else {
-        <ion-icon slot="start" name="log-in-outline"></ion-icon>
-        Sign In
-      }
-    </ion-button>
-
-    <a routerLink="/auth/forgot-password" class="auth-link">Forgot password?</a>
-    <a routerLink="/auth/signup" class="auth-link">Don't have an account? Sign up</a>
+  <a routerLink="/auth/forgot-password" class="auth-link">Forgot password?</a>
+  <a routerLink="/auth/signup" class="auth-link">Don't have an account? Sign up</a>
 </form>

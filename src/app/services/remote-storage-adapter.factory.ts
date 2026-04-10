@@ -4,7 +4,7 @@ import { inject, Injectable } from '@angular/core';
 import { SUPABASE_STORAGE } from './tokens/supabase-storage.token';
 
 /** Factory for creating {@link RemoteStorageAdapter} instances backed by Supabase Storage. */
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class RemoteStorageAdapterFactory {
   private readonly storage = inject(SUPABASE_STORAGE);
 

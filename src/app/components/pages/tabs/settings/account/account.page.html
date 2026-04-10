@@ -19,70 +19,14 @@
       <ion-spinner name="crescent"></ion-spinner>
     </div>
   } @else {
-    <div class="flex flex-col items-center pt-6 pb-2">
-      <div class="relative cursor-pointer" (click)="avatarInput.click()">
-        <ion-avatar class="w-24 h-24">
-          @if (avatarUrl()) {
-            <img [src]="avatarUrl()" alt="Avatar" />
-          } @else {
-            <div class="flex items-center justify-center w-full h-full bg-[var(--ion-color-light)] text-[color:var(--ion-color-medium)]">
-              <ion-icon name="person" class="text-4xl"></ion-icon>
-            </div>
-          }
-        </ion-avatar>
-        @if (uploadingAvatar()) {
-          <div class="absolute inset-0 flex items-center justify-center rounded-full bg-black/40">
-            <ion-spinner name="crescent" color="light"></ion-spinner>
-          </div>
-        }
-      </div>
-      <input
-        #avatarInput
-        type="file"
-        accept="image/*"
-        class="hidden"
-        (change)="onAvatarSelected($event)"
-      />
-      <button type="button" class="mt-2 text-sm text-[color:var(--ion-color-primary)]" (click)="avatarInput.click()">
-        Change Avatar
-      </button>
-    </div>
-
-    <form [formGroup]="profileForm" (ngSubmit)="save()" class="ion-padding">
-      <ion-list>
-        <ion-item>
-          <ion-input
-            label="Full Name"
-            labelPlacement="stacked"
-            formControlName="full_name"
-            placeholder="Your full name"
-          ></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-input
-            label="Username"
-            labelPlacement="stacked"
-            formControlName="username"
-            placeholder="Your username"
-          ></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-textarea
-            label="Bio"
-            labelPlacement="stacked"
-            formControlName="bio"
-            placeholder="Tell us about yourself"
-            [autoGrow]="true"
-            [rows]="3"
-          ></ion-textarea>
-        </ion-item>
-      </ion-list>
+    <div class="ion-padding">
+      <app-profile-form #profileForm [(value)]="profileModel" formName="Account"></app-profile-form>
 
       <ion-button
         expand="block"
-        type="submit"
         class="ion-margin-top"
-        [disabled]="saving() || profileForm.pristine"
+        [disabled]="saving() || profileForm.form().invalid()"
+        (click)="save()"
       >
         @if (saving()) {
           <ion-spinner name="crescent"></ion-spinner>
@@ -90,6 +34,6 @@
           Save
         }
       </ion-button>
-    </form>
+    </div>
   }
 </ion-content>

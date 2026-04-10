@@ -1,6 +1,9 @@
-import { Component, inject, input, viewChild } from '@angular/core';
+import { Component, effect, inject, input, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import {
+  IonButton,
+  IonIcon,
+  IonSpinner,
   IonHeader,
   IonToolbar,
   IonTitle,
@@ -9,17 +12,19 @@ import {
   IonBackButton,
 } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import { saveOutline } from 'ionicons/icons';
 import { RecipeService } from '@services/recipe.service';
-import { Recipe } from '@types';
-import {
-  RecipeFormComponent,
-  RecipeFormValue,
-} from '@app/components/forms/recipe-form/recipe-form.component';
+import { Recipe, CreateRecipe } from '@types';
+import { RecipeFormComponent } from '@app/components/forms/recipe-form/recipe-form.component';
 
 @Component({
   selector: 'app-edit-recipe',
   standalone: true,
   imports: [
+    IonButton,
+    IonIcon,
+    IonSpinner,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -36,13 +41,56 @@ export class EditRecipePage {
   private router = inject(Router);
 
   recipe = input.required<Recipe>();
-  private recipeForm = viewChild<RecipeFormComponent>('recipeForm');
+  private recipeForm = viewChild.required<RecipeFormComponent>('recipeForm');
 
-  protected async submit(value: RecipeFormValue) {
+  protected recipeModel = signal<CreateRecipe>({
+    name: '',
+    description: '',
+    source: null,
+    servings: null,
+    prep_time_minutes: null,
+    cook_time_minutes: null,
+    difficulty: null,
+    calories: null,
+    protein_grams: null,
+    carbs_grams: null,
+    fat_grams: null,
+    ingredients: [],
+    instructions: [],
+  });
+  protected loading = signal(false);
+
+  constructor() {
+    addIcons({ saveOutline });
+
+    effect(() => {
+      const r = this.recipe();
+      this.recipeModel.set({
+        name: r.name,
+        description: r.description,
+        source: r.source,
+        servings: r.servings,
+        prep_time_minutes: r.prep_time_minutes,
+        cook_time_minutes: r.cook_time_minutes,
+        difficulty: r.difficulty,
+        calories: r.calories,
+        protein_grams: r.protein_grams,
+        carbs_grams: r.carbs_grams,
+        fat_grams: r.fat_grams,
+        ingredients: r.ingredients.map((i) => i.value),
+        instructions: r.instructions.map((i) => i.value),
+      });
+    });
+  }
+
+  protected async submit() {
+    if (this.recipeForm().form().invalid()) return;
+
+    this.loading.set(true);
     try {
       await this.recipeService.updateRecipe({
         id: this.recipe().id,
-        ...value,
+        ...this.recipeModel(),
       });
 
       const toast = await this.toastCtrl.create({
@@ -60,7 +108,7 @@ export class EditRecipePage {
       });
       await toast.present();
     } finally {
-      this.recipeForm()?.resetLoading();
+      this.loading.set(false);
     }
   }
 }

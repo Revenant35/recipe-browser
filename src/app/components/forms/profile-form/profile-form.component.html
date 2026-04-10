@@ -1,0 +1,48 @@
+<ion-list>
+  <ion-list-header>
+    <ion-label>{{ formName() }}</ion-label>
+  </ion-list-header>
+
+  <ion-item>
+    <ion-input
+      label="Username"
+      labelPlacement="floating"
+      fill="outline"
+      [formField]="form.username"
+    ></ion-input>
+  </ion-item>
+  @if (form.username().touched() && form.username().invalid()) {
+    <p class="text-red-500 text-sm px-4">
+      {{ form.username().errors()[0].message }}
+    </p>
+  }
+
+  <ion-item>
+    <ion-input
+      label="Full Name"
+      labelPlacement="floating"
+      fill="outline"
+      [formField]="form.full_name"
+    ></ion-input>
+  </ion-item>
+  @if (form.full_name().touched() && form.full_name().invalid()) {
+    <p class="text-red-500 text-sm px-4">
+      {{ form.full_name().errors()[0].message }}
+    </p>
+  }
+
+  <ion-item>
+    <ion-textarea
+      label="Bio"
+      labelPlacement="floating"
+      fill="outline"
+      [formField]="form.bio"
+      [autoGrow]="true"
+    ></ion-textarea>
+  </ion-item>
+  @if (form.bio().touched() && form.bio().invalid()) {
+    <p class="text-red-500 text-sm px-4">
+      {{ form.bio().errors()[0].message }}
+    </p>
+  }
+</ion-list>

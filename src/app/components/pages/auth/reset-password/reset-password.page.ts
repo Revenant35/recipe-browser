@@ -1,16 +1,19 @@
-import { Component, inject, signal } from '@angular/core';
-import { IonButton, IonIcon, IonInput, IonSpinner } from '@ionic/angular/standalone';
+import { Component, inject, signal, viewChild } from '@angular/core';
+import { IonButton, IonIcon, IonSpinner } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { addIcons } from 'ionicons';
 import { lockClosedOutline } from 'ionicons/icons';
 import { AuthService } from '@services/auth.service';
+import {
+  ResetPasswordFormComponent,
+  ResetPasswordFormValue,
+} from '@app/components/forms/reset-password-form/reset-password-form.component';
 
 @Component({
   selector: 'app-reset-password',
   standalone: true,
-  imports: [IonButton, IonIcon, IonInput, IonSpinner, ReactiveFormsModule],
+  imports: [IonButton, IonIcon, IonSpinner, ResetPasswordFormComponent],
   templateUrl: './reset-password.page.html',
   styleUrl: './reset-password.page.scss',
 })
@@ -19,26 +22,21 @@ export class ResetPasswordPage {
   private toastCtrl = inject(ToastController);
   private router = inject(Router);
 
-  protected passwordForm = new FormGroup({
-    password: new FormControl('', [Validators.required, Validators.minLength(8)]),
-    confirmPassword: new FormControl('', [Validators.required]),
-  });
+  private resetForm = viewChild.required<ResetPasswordFormComponent>('resetForm');
+
+  protected passwordModel = signal<ResetPasswordFormValue>({ password: '', confirmPassword: '' });
   protected loading = signal(false);
 
   constructor() {
     addIcons({ lockClosedOutline });
   }
 
-  protected passwordsMatch(): boolean {
-    return this.passwordForm.value.password === this.passwordForm.value.confirmPassword;
-  }
-
   protected async submit(): Promise<void> {
-    if (this.passwordForm.invalid || !this.passwordsMatch()) return;
+    if (this.resetForm().form().invalid()) return;
 
-    const { password } = this.passwordForm.value;
+    const { password } = this.passwordModel();
     this.loading.set(true);
-    const { error } = await this.auth.updatePassword(password!);
+    const { error } = await this.auth.updatePassword(password);
     this.loading.set(false);
 
     if (error) {

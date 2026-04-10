@@ -1,5 +1,5 @@
 import { Injectable, inject, OnDestroy } from '@angular/core';
-import { asc, eq, isNull } from 'drizzle-orm';
+import { asc, eq } from 'drizzle-orm';
 import { firstValueFrom, ReplaySubject } from 'rxjs';
 import {
   recipes,
@@ -9,12 +9,17 @@ import {
   recipeTags,
   savedRecipes,
 } from '@db';
-import { Recipe } from '@types';
+import { Recipe, CreateRecipe, CountedResult } from '@types';
 import { SUPABASE_CLIENT } from '@tokens/supabase-client.token';
 import { RecipeMapper } from '@mappers';
 import { AuthService } from './auth.service';
 import { DATABASE } from './tokens/database.token';
 import { POWERSYNC_DATABASE } from './tokens/powersync-database.token';
+
+export interface UpdateRecipeInput extends CreateRecipe {
+  id: string;
+}
+
 
 @Injectable({ providedIn: 'root' })
 export class RecipeService implements OnDestroy {
@@ -107,28 +112,28 @@ export class RecipeService implements OnDestroy {
     return this.mapper.fromEntity(row);
   }
 
-  async createRecipe(recipe: Omit<Recipe, 'id' | 'created_at'>): Promise<Recipe> {
+  async createRecipe(recipe: CreateRecipe): Promise<string> {
+    const session = await firstValueFrom(this.auth.session$);
+    if (!session?.user) throw new Error('You must be logged in to create a recipe.');
+
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
-
-    const row = this.mapper.toEntity({
-      recipe
-    });
 
     const { ingredients, instructions, ...recipeData } = recipe;
 
     await this.database.insert(recipes).values({
-      id: id,
+      id,
       created_at: now,
+      user_id: session.user.id,
       ...recipeData,
     });
 
     if (ingredients?.length) {
       await this.database.insert(recipeIngredients).values(
-        ingredients.map((value, index) => ({
+        ingredients.map((value: string, index: number) => ({
           id: crypto.randomUUID(),
           created_at: now,
-          recipe_id: recipeId,
+          recipe_id: id,
           value,
           order: index,
         })),
@@ -137,17 +142,17 @@ export class RecipeService implements OnDestroy {
 
     if (instructions?.length) {
       await this.database.insert(recipeInstructions).values(
-        instructions.map((value, index) => ({
+        instructions.map((value: string, index: number) => ({
           id: crypto.randomUUID(),
           created_at: now,
-          recipe_id: recipeId,
+          recipe_id: id,
           value,
           order: index,
         })),
       );
     }
 
-    return recipeId;
+    return id;
   }
 
   async updateRecipe(input: UpdateRecipeInput): Promise<void> {
@@ -161,7 +166,7 @@ export class RecipeService implements OnDestroy {
 
     if (ingredients?.length) {
       await this.database.insert(recipeIngredients).values(
-        ingredients.map((value, index) => ({
+        ingredients.map((value: string, index: number) => ({
           id: crypto.randomUUID(),
           created_at: now,
           recipe_id: id,
@@ -173,7 +178,7 @@ export class RecipeService implements OnDestroy {
 
     if (instructions?.length) {
       await this.database.insert(recipeInstructions).values(
-        instructions.map((value, index) => ({
+        instructions.map((value: string, index: number) => ({
           id: crypto.randomUUID(),
           created_at: now,
           recipe_id: id,
@@ -213,7 +218,7 @@ export class RecipeService implements OnDestroy {
   // --- Explore (Supabase direct queries) ---
 
   /** Search all recipes via Supabase (not local DB) with pagination */
-  async exploreRecipes(query: string, page: number, pageSize: number): Promise<ExploreResult> {
+  async exploreRecipes(query: string, page: number, pageSize: number): Promise<CountedResult<Recipe>> {
     const from = page * pageSize;
     const to = from + pageSize - 1;
 
@@ -234,7 +239,37 @@ export class RecipeService implements OnDestroy {
     if (error) throw error;
 
     return {
-      recipes: (data ?? []) as unknown as ExploreRecipe[],
+      items: (data ?? []).map((row) => ({
+        id: row.id,
+        created_at: row.created_at ? new Date(row.created_at) : null,
+        name: row.name,
+        description: row.description,
+        servings: row.servings,
+        prep_time_minutes: row.prep_time_minutes,
+        cook_time_minutes: row.cook_time_minutes,
+        difficulty: row.difficulty,
+        source: null,
+        calories: null,
+        protein_grams: null,
+        carbs_grams: null,
+        fat_grams: null,
+        category: null,
+        cuisine: null,
+        tags: [],
+        ingredients: [],
+        instructions: [],
+        notes: [],
+        author: {
+          id: row.user_id,
+          updated_at: null,
+          username: row.profiles?.username ?? null,
+          full_name: row.profiles?.full_name ?? null,
+          avatar_url: row.profiles?.avatar_url ?? null,
+          bio: null,
+          badge: null,
+          wallpaper: null,
+        },
+      })) as Recipe[],
       count: count ?? 0,
     };
   }
@@ -289,6 +324,6 @@ export class RecipeService implements OnDestroy {
     const { data, error } = await this.supabase.from('saved_recipes').select('recipe_id');
 
     if (error) throw error;
-    return new Set((data ?? []).map((r: { recipe_id: string }) => r.recipe_id));
+    return new Set((data ?? []).map((r) => r.recipe_id));
   }
 }

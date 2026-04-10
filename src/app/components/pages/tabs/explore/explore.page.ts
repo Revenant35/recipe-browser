@@ -22,7 +22,7 @@ import { RecipeService } from '@services/recipe.service';
 import { AuthService } from '@services/auth.service';
 import { firstValueFrom } from 'rxjs';
 import { InfiniteScrollCustomEvent } from '@ionic/angular';
-import { Recipe } from '@app/models/types';
+import { Recipe } from '@types';
 
 @Component({
   selector: 'app-explore',
@@ -80,7 +80,7 @@ export class ExplorePage implements ViewWillEnter {
         this.recipeService.exploreRecipes(this.searchQuery(), 0, this.PAGE_SIZE),
         this.recipeService.getSavedRecipeIds(),
       ]);
-      this.recipes.set(result.recipes);
+      this.recipes.set(result.items);
       this.totalCount.set(result.count);
       this.savedIds.set(savedIds);
     } finally {
@@ -95,7 +95,7 @@ export class ExplorePage implements ViewWillEnter {
       this.currentPage,
       this.PAGE_SIZE,
     );
-    this.recipes.update((prev) => [...prev, ...result.recipes]);
+    this.recipes.update((prev) => [...prev, ...result.items]);
     await event.target.complete();
 
     if (this.recipes().length >= this.totalCount()) {
