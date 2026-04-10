@@ -24,7 +24,7 @@ Two streams are defined in `sync-config.yaml`:
 
 ## Invariants
 
-- Sync stream table references must match the Supabase schema (`supabase/migrations/`) and Drizzle schema (`src/app/db/schema.ts`)
+- Sync stream table references must match the Supabase schema (`supabase/migrations/`) and Drizzle schema (`src/db/index.ts`)
 - Adding a new synced table requires updating `sync-config.yaml`, the Drizzle schema, and a Supabase migration
 - Always run `npx powersync validate` before deploying changes
 - `cli.yaml` contains instance-specific link data — do not edit manually

@@ -26,7 +26,7 @@ The initial migration (`20260331190000_initial_schema.sql`) captures the full pr
 
 ## Invariants
 
-- Schema changes require both a new migration here AND an update to `src/app/db/schema.ts` (Drizzle)
+- Schema changes require both a new migration here AND an update to `src/db/index.ts` (Drizzle)
 - Never edit an existing migration that has been applied — always create a new one
 - Storage bucket config lives in both `config.toml` (local dev) and the initial migration (remote)
 - The project is linked to remote ref `iavcgbdesrlhesrmszlq`

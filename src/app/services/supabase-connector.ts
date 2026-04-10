@@ -8,7 +8,7 @@ import {
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
-import { SUPABASE_CLIENT } from '@app/supabase/supabase-client.token';
+import { SUPABASE_CLIENT } from '@tokens/supabase-client.token';
 
 const FATAL_RESPONSE_CODES = [
   /^22...$/, // data exception

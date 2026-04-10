@@ -10,8 +10,9 @@ streams:
   global:
     auto_subscribe: true
     queries:
-      - SELECT * FROM recipe_difficulties
       - SELECT * FROM profiles
+      - SELECT * FROM wallpapers
+      - SELECT * FROM badges
 
   by_user:
     auto_subscribe: true
@@ -19,7 +20,6 @@ streams:
       user_recipe_ids: SELECT id FROM recipes WHERE user_id = auth.user_id()
     queries:
       - SELECT * FROM recipes WHERE user_id = auth.user_id()
-      - SELECT * FROM tags WHERE user_id = auth.user_id()
       - SELECT * FROM recipe_notes WHERE recipe_id IN user_recipe_ids
       - SELECT * FROM recipe_ingredients WHERE recipe_id IN user_recipe_ids
       - SELECT * FROM recipe_instructions WHERE recipe_id IN user_recipe_ids

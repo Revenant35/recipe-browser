@@ -1,41 +1,45 @@
 import { Injectable, inject } from '@angular/core';
 import { eq } from 'drizzle-orm';
-import { PowerSyncService } from './powersync.service';
-import { profiles } from '@app/db/schema';
-import { Profile } from '@app/models';
-import { SUPABASE_CLIENT } from '@app/supabase/supabase-client.token';
+import { profiles } from '@db';
+import { Profile } from '@types';
+import { SUPABASE_CLIENT } from '@tokens/supabase-client.token';
+import { ProfileRow } from '@entities';
+import { DATABASE } from './tokens/database.token';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
-  private powerSync = inject(PowerSyncService);
-  private supabase = inject(SUPABASE_CLIENT);
-
-  private get db() {
-    return this.powerSync.drizzle;
-  }
+  private readonly database = inject(DATABASE);
+  private readonly supabase = inject(SUPABASE_CLIENT);
 
   getProfile(userId: string): Promise<Profile | undefined> {
-    return this.db.query.profiles.findFirst({
+    return this.database.query.profiles.findFirst({
       where: eq(profiles.id, userId),
+      with: { badge: true, wallpaper: true },
     });
   }
 
   async getProfileFromSupabase(userId: string): Promise<Profile | undefined> {
     const { data, error } = await this.supabase
       .from('profiles')
-      .select('*')
+      .select('*, badges(*), wallpapers(*)')
       .eq('id', userId)
       .single();
 
     if (error || !data) return undefined;
-    return data as unknown as Profile;
+    const { badges: badge, wallpapers: wallpaper, ...rest } = data;
+    return { ...rest, badge: badge ?? null, wallpaper: wallpaper ?? null } as Profile;
   }
 
   async updateProfile(
     userId: string,
-    data: Partial<Pick<Profile, 'full_name' | 'username' | 'website' | 'avatar_url'>>,
+    data: Partial<
+      Pick<
+        ProfileRow,
+        'full_name' | 'username' | 'bio' | 'avatar_url' | 'wallpaper_id' | 'badge_id'
+      >
+    >,
   ): Promise<void> {
-    await this.db
+    await this.database
       .update(profiles)
       .set({
         ...data,

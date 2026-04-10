@@ -1,111 +1,128 @@
-import { Injectable, inject } from '@angular/core';
-import { asc, eq } from 'drizzle-orm';
-import { PowerSyncService } from './powersync.service';
-import { recipes, recipeIngredients, recipeInstructions, recipeNotes, recipeTags, recipeDifficulties, savedRecipes } from '@app/db/schema';
-import { RecipeWithDetails, RecipeDifficulty } from '@app/models';
-import { SUPABASE_CLIENT } from '@app/supabase/supabase-client.token';
-
-export interface CreateRecipeInput {
-  name: string;
-  description: string;
-  user_id: string;
-  servings?: number;
-  prep_time_minutes?: number;
-  cook_time_minutes?: number;
-  source?: string;
-  difficulty?: string;
-  carbs_grams?: number;
-  protein_grams?: number;
-  fat_grams?: number;
-  calories?: number;
-  ingredients?: string[];
-  instructions?: string[];
-}
-
-export interface UpdateRecipeInput {
-  id: string;
-  name: string;
-  description: string;
-  servings?: number;
-  prep_time_minutes?: number;
-  cook_time_minutes?: number;
-  source?: string;
-  difficulty?: string;
-  carbs_grams?: number;
-  protein_grams?: number;
-  fat_grams?: number;
-  calories?: number;
-  ingredients?: string[];
-  instructions?: string[];
-}
-
-export interface ExploreRecipe {
-  id: string;
-  created_at: string;
-  name: string;
-  user_id: string;
-  description: string;
-  servings: number | null;
-  prep_time_minutes: number | null;
-  cook_time_minutes: number | null;
-  difficulty: string | null;
-  recipe_difficulties: { name: string } | null;
-  profiles: { full_name: string | null; username: string | null; avatar_url: string | null } | null;
-}
-
-export interface ExploreResult {
-  recipes: ExploreRecipe[];
-  count: number;
-}
+import { Injectable, inject, OnDestroy } from '@angular/core';
+import { asc, eq, isNull } from 'drizzle-orm';
+import { firstValueFrom, ReplaySubject } from 'rxjs';
+import {
+  recipes,
+  recipeIngredients,
+  recipeInstructions,
+  recipeNotes,
+  recipeTags,
+  savedRecipes,
+} from '@db';
+import { Recipe } from '@types';
+import { SUPABASE_CLIENT } from '@tokens/supabase-client.token';
+import { RecipeMapper } from '@mappers';
+import { AuthService } from './auth.service';
+import { DATABASE } from './tokens/database.token';
 
 @Injectable({ providedIn: 'root' })
-export class RecipeService {
-  private powerSync = inject(PowerSyncService);
-  private supabase = inject(SUPABASE_CLIENT);
+export class RecipeService implements OnDestroy {
+  private readonly database = inject(DATABASE);
+  private readonly supabase = inject(SUPABASE_CLIENT);
+  private readonly auth = inject(AuthService);
+  private readonly mapper = inject(RecipeMapper);
+  private readonly abortController = new AbortController();
 
-  private get db() {
-    return this.powerSync.drizzle;
+  private readonly _recipes$ = new ReplaySubject<Recipe[]>(1);
+  public readonly recipes$ = this._recipes$.asObservable();
+
+  constructor() {
+    this.watchRecipes();
   }
 
-  getRecipes(): Promise<RecipeWithDetails[]> {
-    return this.db.query.recipes.findMany({
+  ngOnDestroy(): void {
+    this.abortController.abort();
+    this._recipes$.complete();
+  }
+
+  private async watchRecipes(): Promise<void> {
+    const watch = this.database.watch('SELECT id FROM recipes', [], {
+      signal: this.abortController.signal,
+    });
+
+    for await (const _ of watch) {
+      const recipes = await this.getRecipes();
+      this._recipes$.next(recipes);
+    }
+  }
+
+  async getRecipes(): Promise<Recipe[]> {
+    const session = await firstValueFrom(this.auth.session$);
+    const userId = session?.user?.id;
+
+    let savedRecipeWhereClause;
+    if (userId) {
+      savedRecipeWhereClause = eq(savedRecipes.user_id, userId);
+    } else {
+      savedRecipeWhereClause = isNull(savedRecipes.user_id);
+    }
+
+    const rows = await this.database.query.recipes.findMany({
       with: {
-        recipeTags: { with: { tag: true } },
-        difficultyLevel: true,
+        recipeTags: true,
         ingredients: { orderBy: asc(recipeIngredients.order) },
         instructions: { orderBy: asc(recipeInstructions.order) },
         notes: true,
+        savedRecipes: {
+          where: savedRecipeWhereClause,
+          limit: 1,
+        },
       },
     });
+
+    return rows.map(this.mapper.fromEntity);
   }
 
-  getRecipe(id: string): Promise<RecipeWithDetails | undefined> {
-    return this.db.query.recipes.findFirst({
+  async getRecipe(id: string): Promise<Recipe | undefined> {
+    const session = await firstValueFrom(this.auth.session$);
+    const userId = session?.user?.id;
+
+    let savedRecipeWhereClause;
+    if (userId) {
+      savedRecipeWhereClause = eq(savedRecipes.user_id, userId);
+    } else {
+      savedRecipeWhereClause = isNull(savedRecipes.user_id);
+    }
+
+    const row = await this.database.query.recipes.findFirst({
       where: eq(recipes.id, id),
       with: {
-        recipeTags: { with: { tag: true } },
-        difficultyLevel: true,
+        recipeTags: true,
         ingredients: { orderBy: asc(recipeIngredients.order) },
         instructions: { orderBy: asc(recipeInstructions.order) },
         notes: true,
+        savedRecipes: {
+          where: savedRecipeWhereClause,
+          limit: 1,
+        },
       },
     });
+
+    if (!row) {
+      return undefined;
+    }
+
+    return this.mapper.fromEntity(row);
   }
 
-  async createRecipe(input: CreateRecipeInput): Promise<string> {
-    const recipeId = crypto.randomUUID();
+  async createRecipe(recipe: Omit<Recipe, 'id' | 'created_at'>): Promise<string> {
+    const id = crypto.randomUUID();
     const now = new Date().toISOString();
 
-    const { ingredients, instructions, ...recipeData } = input;
+    const row = this.mapper.toEntity({
+      recipe
+    });
 
-    await this.db.insert(recipes).values({
-      id: recipeId,
+    const { ingredients, instructions, ...recipeData } = recipe;
+
+    await this.database.insert(recipes).values({
+      id: id,
       created_at: now,
       ...recipeData,
     });
 
     if (ingredients?.length) {
-      await this.db.insert(recipeIngredients).values(
+      await this.database.insert(recipeIngredients).values(
         ingredients.map((value, index) => ({
           id: crypto.randomUUID(),
           created_at: now,
@@ -117,7 +134,7 @@ export class RecipeService {
     }
 
     if (instructions?.length) {
-      await this.db.insert(recipeInstructions).values(
+      await this.database.insert(recipeInstructions).values(
         instructions.map((value, index) => ({
           id: crypto.randomUUID(),
           created_at: now,
@@ -135,16 +152,13 @@ export class RecipeService {
     const { id, ingredients, instructions, ...recipeData } = input;
     const now = new Date().toISOString();
 
-    await this.db
-      .update(recipes)
-      .set(recipeData)
-      .where(eq(recipes.id, id));
+    await this.database.update(recipes).set(recipeData).where(eq(recipes.id, id));
 
-    await this.db.delete(recipeIngredients).where(eq(recipeIngredients.recipe_id, id));
-    await this.db.delete(recipeInstructions).where(eq(recipeInstructions.recipe_id, id));
+    await this.database.delete(recipeIngredients).where(eq(recipeIngredients.recipe_id, id));
+    await this.database.delete(recipeInstructions).where(eq(recipeInstructions.recipe_id, id));
 
     if (ingredients?.length) {
-      await this.db.insert(recipeIngredients).values(
+      await this.database.insert(recipeIngredients).values(
         ingredients.map((value, index) => ({
           id: crypto.randomUUID(),
           created_at: now,
@@ -156,7 +170,7 @@ export class RecipeService {
     }
 
     if (instructions?.length) {
-      await this.db.insert(recipeInstructions).values(
+      await this.database.insert(recipeInstructions).values(
         instructions.map((value, index) => ({
           id: crypto.randomUUID(),
           created_at: now,
@@ -169,48 +183,19 @@ export class RecipeService {
   }
 
   async deleteRecipe(id: string): Promise<void> {
-    await this.db.delete(recipeIngredients).where(eq(recipeIngredients.recipe_id, id));
-    await this.db.delete(recipeInstructions).where(eq(recipeInstructions.recipe_id, id));
-    await this.db.delete(recipeNotes).where(eq(recipeNotes.recipe_id, id));
-    await this.db.delete(recipeTags).where(eq(recipeTags.recipe_id, id));
-    await this.db.delete(recipes).where(eq(recipes.id, id));
-  }
-
-  getDifficulties(): Promise<RecipeDifficulty[]> {
-    return this.db.query.recipeDifficulties.findMany();
+    await this.database.delete(savedRecipes).where(eq(savedRecipes.recipe_id, id));
+    await this.database.delete(recipeIngredients).where(eq(recipeIngredients.recipe_id, id));
+    await this.database.delete(recipeInstructions).where(eq(recipeInstructions.recipe_id, id));
+    await this.database.delete(recipeNotes).where(eq(recipeNotes.recipe_id, id));
+    await this.database.delete(recipeTags).where(eq(recipeTags.recipe_id, id));
+    await this.database.delete(recipes).where(eq(recipes.id, id));
   }
 
   // --- Saved Recipes (PowerSync local DB) ---
 
-  /** Get all recipes the user has saved (includes own recipes via saved_recipes join) */
-  async getSavedRecipes(): Promise<RecipeWithDetails[]> {
-    const saved = await this.db.query.savedRecipes.findMany({
-      with: {
-        recipe: {
-          with: {
-            recipeTags: { with: { tag: true } },
-            difficultyLevel: true,
-            ingredients: { orderBy: asc(recipeIngredients.order) },
-            instructions: { orderBy: asc(recipeInstructions.order) },
-            notes: true,
-          },
-        },
-      },
-    });
-    return saved.map((s) => s.recipe);
-  }
-
-  /** Check if a recipe is saved by the current user (local DB) */
-  async isRecipeSaved(recipeId: string): Promise<boolean> {
-    const row = await this.db.query.savedRecipes.findFirst({
-      where: eq(savedRecipes.recipe_id, recipeId),
-    });
-    return !!row;
-  }
-
   /** Save a recipe for the current user */
   async saveRecipe(userId: string, recipeId: string): Promise<void> {
-    await this.db.insert(savedRecipes).values({
+    await this.database.insert(savedRecipes).values({
       id: crypto.randomUUID(),
       created_at: new Date().toISOString(),
       user_id: userId,
@@ -220,7 +205,7 @@ export class RecipeService {
 
   /** Unsave a recipe for the current user */
   async unsaveRecipe(recipeId: string): Promise<void> {
-    await this.db.delete(savedRecipes).where(eq(savedRecipes.recipe_id, recipeId));
+    await this.database.delete(savedRecipes).where(eq(savedRecipes.recipe_id, recipeId));
   }
 
   // --- Explore (Supabase direct queries) ---
@@ -253,7 +238,7 @@ export class RecipeService {
   }
 
   /** Get a single recipe with full details from Supabase (for when it's not in local DB) */
-  async getRecipeFromSupabase(id: string): Promise<RecipeWithDetails | undefined> {
+  async getRecipeFromSupabase(id: string): Promise<Recipe | undefined> {
     const { data: recipe, error: recipeError } = await this.supabase
       .from('recipes')
       .select('*')
@@ -273,14 +258,8 @@ export class RecipeService {
         .select('*')
         .eq('recipe_id', id)
         .order('order', { ascending: true }),
-      this.supabase
-        .from('recipe_notes')
-        .select('*')
-        .eq('recipe_id', id),
-      this.supabase
-        .from('recipe_tags')
-        .select('*, tags(*)')
-        .eq('recipe_id', id),
+      this.supabase.from('recipe_notes').select('*').eq('recipe_id', id),
+      this.supabase.from('recipe_tags').select('*').eq('recipe_id', id),
     ]);
 
     let difficultyLevel = null;
@@ -298,19 +277,14 @@ export class RecipeService {
       ingredients: ingredientsRes.data ?? [],
       instructions: instructionsRes.data ?? [],
       notes: notesRes.data ?? [],
-      recipeTags: (tagsRes.data ?? []).map((rt: any) => ({
-        ...rt,
-        tag: rt.tags,
-      })),
+      tags: (tagsRes.data ?? []).map(({ id, created_at, name }: any) => ({ id, created_at, name })),
       difficultyLevel,
-    } as unknown as RecipeWithDetails;
+    } as unknown as Recipe;
   }
 
   /** Get saved recipe IDs from Supabase (for showing bookmark state on Explore page) */
   async getSavedRecipeIds(): Promise<Set<string>> {
-    const { data, error } = await this.supabase
-      .from('saved_recipes')
-      .select('recipe_id');
+    const { data, error } = await this.supabase.from('saved_recipes').select('recipe_id');
 
     if (error) throw error;
     return new Set((data ?? []).map((r: { recipe_id: string }) => r.recipe_id));

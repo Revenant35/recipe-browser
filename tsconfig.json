@@ -25,7 +25,16 @@
     "skipLibCheck": true,
     "useDefineForClassFields": false,
     "paths": {
-      "@app/*": ["src/app/*"]
+      "@app/*": ["src/app/*"],
+      "@db": ["src/db"],
+      "@entities": ["src/app/models/entities"],
+      "@environment": ["src/environments/environment.ts"],
+      "@guards": ["src/app/utils/guards"],
+      "@mappers": ["src/app/models/mappers"],
+      "@resolvers": ["src/app/utils/resolvers"],
+      "@services/*": ["src/app/services/*"],
+      "@tokens/*": ["src/app/services/tokens/*"],
+      "@types": ["src/app/models/types"]
     }
   },
   "angularCompilerOptions": {

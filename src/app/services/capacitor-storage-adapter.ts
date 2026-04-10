@@ -1,15 +1,17 @@
 import { LocalStorageAdapter } from '@powersync/web';
-import { Injectable } from '@angular/core';
-import { Directory, Filesystem } from '@capacitor/filesystem';
+import { inject, Injectable } from '@angular/core';
+import { Directory } from '@capacitor/filesystem';
+import { FILESYSTEM } from './tokens/filesystem.token';
 
 @Injectable()
 export class CapacitorStorageAdapter implements LocalStorageAdapter {
+  private readonly filesystem = inject(FILESYSTEM);
   private readonly directory = Directory.LibraryNoCloud;
   private readonly path = 'attachments';
 
   async initialize(): Promise<void> {
     try {
-      await Filesystem.mkdir({
+      await this.filesystem.mkdir({
         path: this.path,
         directory: this.directory,
         recursive: true,
@@ -24,7 +26,7 @@ export class CapacitorStorageAdapter implements LocalStorageAdapter {
 
   async clear(): Promise<void> {
     try {
-      await Filesystem.rmdir({
+      await this.filesystem.rmdir({
         path: this.path,
         directory: this.directory,
         recursive: true,
@@ -32,7 +34,7 @@ export class CapacitorStorageAdapter implements LocalStorageAdapter {
     } catch {
       // Directory may not exist
     }
-    await Filesystem.mkdir({
+    await this.filesystem.mkdir({
       path: this.path,
       directory: this.directory,
       recursive: true,
@@ -46,14 +48,14 @@ export class CapacitorStorageAdapter implements LocalStorageAdapter {
   async saveFile(filePath: string, data: ArrayBuffer | string): Promise<number> {
     const base64 = typeof data === 'string' ? data : this.arrayBufferToBase64(data);
 
-    await Filesystem.writeFile({
+    await this.filesystem.writeFile({
       path: filePath,
       data: base64,
       directory: this.directory,
       recursive: true,
     });
 
-    const stat = await Filesystem.stat({
+    const stat = await this.filesystem.stat({
       path: filePath,
       directory: this.directory,
     });
@@ -62,7 +64,7 @@ export class CapacitorStorageAdapter implements LocalStorageAdapter {
   }
 
   async readFile(filePath: string): Promise<ArrayBuffer> {
-    const result = await Filesystem.readFile({
+    const result = await this.filesystem.readFile({
       path: filePath,
       directory: this.directory,
     });
@@ -75,7 +77,7 @@ export class CapacitorStorageAdapter implements LocalStorageAdapter {
   }
 
   async deleteFile(filePath: string): Promise<void> {
-    await Filesystem.deleteFile({
+    await this.filesystem.deleteFile({
       path: filePath,
       directory: this.directory,
     });
@@ -83,7 +85,7 @@ export class CapacitorStorageAdapter implements LocalStorageAdapter {
 
   async fileExists(filePath: string): Promise<boolean> {
     try {
-      await Filesystem.stat({
+      await this.filesystem.stat({
         path: filePath,
         directory: this.directory,
       });
@@ -95,7 +97,7 @@ export class CapacitorStorageAdapter implements LocalStorageAdapter {
 
   async makeDir(path: string): Promise<void> {
     try {
-      await Filesystem.mkdir({
+      await this.filesystem.mkdir({
         path,
         directory: this.directory,
         recursive: true,
@@ -108,7 +110,7 @@ export class CapacitorStorageAdapter implements LocalStorageAdapter {
   }
 
   async rmDir(path: string): Promise<void> {
-    await Filesystem.rmdir({
+    await this.filesystem.rmdir({
       path,
       directory: this.directory,
       recursive: true,

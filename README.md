@@ -18,7 +18,7 @@ Supabase Auth with email/password. Session state is tracked via a `ReplaySubject
 
 ## Database
 
-Supabase PostgreSQL backend with Drizzle ORM for type-safe queries. All data reads go through Drizzle on the local PowerSync SQLite database — never query Supabase REST API directly for app data. Schema is defined in `src/app/db/schema.ts`.
+Supabase PostgreSQL backend with Drizzle ORM for type-safe queries. All data reads go through Drizzle on the local PowerSync SQLite database — never query Supabase REST API directly for app data. Schema is defined in `src/db/index.ts`.
 
 ## Storage
 

@@ -1,9 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { AttachmentQueue, type AttachmentRecord } from '@powersync/common';
-import { PowerSyncService } from './powersync.service';
 import { SupabaseStorageAdapter, getPublicUrl } from './supabase-storage-adapter';
 import { CapacitorStorageAdapter } from './capacitor-storage-adapter';
-import { SUPABASE_CLIENT } from '@app/supabase/supabase-client.token';
+import { SUPABASE_CLIENT } from '@tokens/supabase-client.token';
+import { POWERSYNC_DATABASE } from './tokens/powersync-database.token';
+import { SUPABASE_STORAGE } from './tokens/supabase-storage.token';
 
 export interface SaveFileOptions {
   data: ArrayBuffer | string;
@@ -15,14 +16,15 @@ export interface SaveFileOptions {
 
 @Injectable({ providedIn: 'root' })
 export class AttachmentService {
-  private readonly powerSyncService = inject(PowerSyncService);
   private readonly supabase = inject(SUPABASE_CLIENT);
+  private readonly storage = inject(SUPABASE_STORAGE);
+  private readonly database = inject(POWERSYNC_DATABASE);
 
   private readonly localStorage = new CapacitorStorageAdapter();
   private readonly remoteStorage = new SupabaseStorageAdapter(this.supabase);
 
   private readonly queue = new AttachmentQueue({
-    db: this.powerSyncService.db,
+    db: this.database,
     localStorage: this.localStorage,
     remoteStorage: this.remoteStorage,
     watchAttachments: () => {
@@ -50,7 +52,7 @@ export class AttachmentService {
       ? file.name.split('.').pop()!
       : file.type.split('/')[1] || 'jpg';
     const path = `${userId}.${ext}`;
-    const { error } = await this.supabase.storage
+    const { error } = await this.storage
       .from('avatars')
       .upload(path, file, { upsert: true, contentType: file.type });
     if (error) throw error;
