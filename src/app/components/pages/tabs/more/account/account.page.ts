@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, viewChild } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import {
   IonHeader,
@@ -11,10 +11,14 @@ import {
   IonSpinner,
 } from '@ionic/angular/standalone';
 import { ToastController } from '@ionic/angular';
+import { form, validateStandardSchema } from '@angular/forms/signals';
 import { AuthService } from '@services/auth.service';
 import { ProfileService } from '@services/profile.service';
-import { CreateProfile } from '@types';
-import { ProfileFormComponent } from '@app/components/forms/profile-form/profile-form.component';
+import {
+  ProfileFormComponent,
+  ProfileFormValue,
+  profileSchema,
+} from '@app/components/forms/profile-form/profile-form.component';
 
 @Component({
   selector: 'app-account',
@@ -36,15 +40,17 @@ export class AccountPage implements OnInit {
   private profileService = inject(ProfileService);
   private toastCtrl = inject(ToastController);
 
-  private profileForm = viewChild.required<ProfileFormComponent>('profileForm');
-
-  protected profileModel = signal<CreateProfile>({
+  protected profileModel = signal<ProfileFormValue>({
     username: '',
     full_name: '',
     bio: '',
   });
   protected loading = signal(true);
   protected saving = signal(false);
+
+  public readonly form = form(this.profileModel, (p) => {
+    validateStandardSchema(p, profileSchema);
+  });
 
   async ngOnInit() {
     const session = await firstValueFrom(this.auth.session$);
@@ -62,7 +68,7 @@ export class AccountPage implements OnInit {
   }
 
   protected async save() {
-    if (!this.profileForm().form().valid()) return;
+    if (!this.form().valid()) return;
 
     const session = await firstValueFrom(this.auth.session$);
     if (!session?.user) return;

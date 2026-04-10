@@ -1,48 +1,46 @@
-<ion-list>
-  <ion-list-header>
-    <ion-label>{{ formName() }}</ion-label>
-  </ion-list-header>
+<ion-input
+  type="text"
+  autocomplete="username"
+  label="Username"
+  labelPlacement="floating"
+  fill="outline"
+  [formField]="form().username"
+  [attr.aria-describedby]="form().username().touched() && form().username().invalid() ? 'profile-username-error' : null"
+  class="mb-2"
+></ion-input>
+@if (form().username().touched() && form().username().invalid()) {
+  <p id="profile-username-error" role="alert" class="text-red-500 text-sm px-4">
+    {{ form().username().errors()[0].message }}
+  </p>
+}
 
-  <ion-item>
-    <ion-input
-      label="Username"
-      labelPlacement="floating"
-      fill="outline"
-      [formField]="form.username"
-    ></ion-input>
-  </ion-item>
-  @if (form.username().touched() && form.username().invalid()) {
-    <p class="text-red-500 text-sm px-4">
-      {{ form.username().errors()[0].message }}
-    </p>
-  }
+<ion-input
+  type="text"
+  autocomplete="name"
+  label="Full Name"
+  labelPlacement="floating"
+  fill="outline"
+  [formField]="form().full_name"
+  [attr.aria-describedby]="form().full_name().touched() && form().full_name().invalid() ? 'profile-fullname-error' : null"
+  class="mb-2"
+></ion-input>
+@if (form().full_name().touched() && form().full_name().invalid()) {
+  <p id="profile-fullname-error" role="alert" class="text-red-500 text-sm px-4">
+    {{ form().full_name().errors()[0].message }}
+  </p>
+}
 
-  <ion-item>
-    <ion-input
-      label="Full Name"
-      labelPlacement="floating"
-      fill="outline"
-      [formField]="form.full_name"
-    ></ion-input>
-  </ion-item>
-  @if (form.full_name().touched() && form.full_name().invalid()) {
-    <p class="text-red-500 text-sm px-4">
-      {{ form.full_name().errors()[0].message }}
-    </p>
-  }
-
-  <ion-item>
-    <ion-textarea
-      label="Bio"
-      labelPlacement="floating"
-      fill="outline"
-      [formField]="form.bio"
-      [autoGrow]="true"
-    ></ion-textarea>
-  </ion-item>
-  @if (form.bio().touched() && form.bio().invalid()) {
-    <p class="text-red-500 text-sm px-4">
-      {{ form.bio().errors()[0].message }}
-    </p>
-  }
-</ion-list>
+<ion-textarea
+  autocomplete="off"
+  label="Bio"
+  labelPlacement="floating"
+  fill="outline"
+  [formField]="form().bio"
+  [autoGrow]="true"
+  [attr.aria-describedby]="form().bio().touched() && form().bio().invalid() ? 'profile-bio-error' : null"
+></ion-textarea>
+@if (form().bio().touched() && form().bio().invalid()) {
+  <p id="profile-bio-error" role="alert" class="text-red-500 text-sm px-4">
+    {{ form().bio().errors()[0].message }}
+  </p>
+}

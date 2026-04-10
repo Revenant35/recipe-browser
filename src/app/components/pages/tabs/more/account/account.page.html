@@ -20,12 +20,12 @@
     </div>
   } @else {
     <div class="ion-padding">
-      <app-profile-form #profileForm [(value)]="profileModel" formName="Account"></app-profile-form>
+      <app-profile-form [(form)]="form"></app-profile-form>
 
       <ion-button
         expand="block"
         class="ion-margin-top"
-        [disabled]="saving() || !profileForm.form().valid()"
+        [disabled]="saving() || !form().valid()"
         (click)="save()"
       >
         @if (saving()) {
